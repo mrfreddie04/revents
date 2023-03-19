@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Form, Header, Segment, Button } from 'semantic-ui-react';
 import cuid from 'cuid';
 
@@ -17,10 +18,6 @@ export default function EventForm({selectedEvent, onFormClose, onEventCreate, on
   const handleInputChange = (e) => {
     const {name, value} = e.target;
     setValues(values => ({...values, [name]:value}));
-  }
-
-  const handleCancel = () => {
-    onFormClose();
   }
 
   const handleFormSubmit = (e) => {
@@ -80,7 +77,7 @@ export default function EventForm({selectedEvent, onFormClose, onEventCreate, on
           />
         </Form.Field>          
         <Button type="submit" floated="right" positive content="Submit"/>
-        <Button type="button" floated="right" content="Cancel" onClick={handleCancel}/>
+        <Button type="button" floated="right" content="Cancel" as={Link} to="/events" />
       </Form>
     </Segment>
   );

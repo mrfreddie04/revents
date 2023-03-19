@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import 'semantic-ui-css/semantic.min.css';
 import './app/layout/styles.css';
 import App from './app/layout/App';
@@ -10,7 +11,9 @@ const rootEl = document.getElementById('root');
 function render() {
   const root = ReactDOM.createRoot(rootEl);
   root.render(
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   );
 }
 
