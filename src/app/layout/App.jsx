@@ -5,8 +5,10 @@ import NavBar from '../../features/nav/NavBar.jsx';
 
 function App() {
   const [formOpen, setFormOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-  const handleFormOpen = () => {
+  const handleCreateFormOpen = () => {
+    setSelectedEvent(null);
     setFormOpen(true);
   }
 
@@ -14,11 +16,21 @@ function App() {
     setFormOpen(false);
   }  
 
+  const handleSelectEvent = (event) => {
+    setSelectedEvent(event);
+    setFormOpen(true);
+  }  
+
   return (
     <Fragment>
-      <NavBar onFormOpen={handleFormOpen}/>
+      <NavBar onFormOpen={handleCreateFormOpen}/>
       <Container className="main">
-        <EventDashboard formOpen={formOpen} onFormClose={handleFormClose}/>
+        <EventDashboard 
+          formOpen={formOpen} 
+          selectedEvent={selectedEvent}
+          onFormClose={handleFormClose} 
+          onSelectEvent={handleSelectEvent}
+        />
       </Container>
     </Fragment>
   );
