@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Segment, Item, Icon, List, Button } from 'semantic-ui-react';
+import { eventActions } from '../event-actions';
 import EventListAttendee from './EventListAttendee';
 
-export default function EventListItem({event, onDeleteEvent}) {
+export default function EventListItem({event}) {
+  const dispatch = useDispatch();
 
   const handleDeleteClick = () => {
-    onDeleteEvent(event);
+    dispatch(eventActions.deleteEvent(event));
   }
 
   return(    

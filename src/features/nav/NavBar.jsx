@@ -33,6 +33,7 @@ export default function NavBar(/*{onFormOpen}*/) {
           {/* <Button positive inverted content="Create Event" onClick={handleClick}/> */}
           <Button positive inverted content="Create Event"/>
         </Menu.Item>}
+        <Menu.Item as={NavLink} to="/sandbox" name="Sandbox"/>
         {!authenticated && <SignedOutMenu onSignIn={handleSignIn} />}
         {authenticated && <SignedInMenu onSignOut={handleSignOut}/>}
       </Container>

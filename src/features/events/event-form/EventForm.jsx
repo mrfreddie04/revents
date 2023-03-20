@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState /*, useEffect*/ } from "react";
+import { Link, useParams, useHistory } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
 import { Form, Header, Segment, Button } from 'semantic-ui-react';
 import cuid from 'cuid';
+import { eventActions } from '../event-actions';
 
 const initialEventValues = {
   title:'',
@@ -12,8 +14,16 @@ const initialEventValues = {
   date:''
 };
 
-export default function EventForm({selectedEvent, onFormClose, onEventCreate, onEventUpdate}) {
-  const [values, setValues] = useState(selectedEvent || initialEventValues);
+export default function EventForm() {
+  const { id } = useParams();
+  const event = useSelector( store => store.event.events.find( event => event.id === id))
+  const [ values, setValues ] = useState(event || initialEventValues);
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  // useEffect(() => {
+  //   setValues(event || initialEventValues);
+  // }, [id])
 
   const handleInputChange = (e) => {
     const {name, value} = e.target;
@@ -22,16 +32,18 @@ export default function EventForm({selectedEvent, onFormClose, onEventCreate, on
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    selectedEvent 
-      ? onEventUpdate({...selectedEvent,...values})
-      : onEventCreate({...values, id: cuid(), hostedBy: 'Bob', attendees: []});
-    onFormClose();  
+    event 
+      ? dispatch(eventActions.updateEvent({...event,...values}))
+      : dispatch(eventActions.createEvent({...values, id: cuid(), hostedBy: 'Bob', attendees: []}));
+    history.push('/events');  
   }
 
-  const header = selectedEvent ? 'Edit event' : 'Create new event';
+  const header = id ? 'Edit event' : 'Create new event';
 
   return(    
-    <Segment clearing>
+    <>    
+    {!values && <div>Loading</div>}
+    {values && (<Segment clearing>
       <Header content={header}/>
       <Form onSubmit={handleFormSubmit}>
         <Form.Field>
@@ -79,6 +91,7 @@ export default function EventForm({selectedEvent, onFormClose, onEventCreate, on
         <Button type="submit" floated="right" positive content="Submit"/>
         <Button type="button" floated="right" content="Cancel" as={Link} to="/events" />
       </Form>
-    </Segment>
+    </Segment>)}
+    </>
   );
 };
