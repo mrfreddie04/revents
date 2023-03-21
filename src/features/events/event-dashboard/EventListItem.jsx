@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Segment, Item, Icon, List, Button } from 'semantic-ui-react';
+import { format } from 'date-fns';
 import { eventActions } from '../event-actions';
 import EventListAttendee from './EventListAttendee';
 
@@ -27,7 +28,7 @@ export default function EventListItem({event}) {
       </Segment>
       <Segment>
         <span>
-          <Icon name='clock'/> {new Date(event.date).toLocaleDateString()}
+          <Icon name='clock'/> {format(event.date, 'MMMM d, yyyy h:mm a')}
           <Icon name='marker'/> {event.venue}
         </span>
       </Segment>

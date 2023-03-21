@@ -8,29 +8,33 @@ import EventDetailedPage from '../../features/events/event-detailed/EventDetaile
 import EventForm from "../../features/events/event-form/EventForm";
 import NavBar from '../../features/nav/NavBar';
 import Sandbox from "../../features/sandbox/Sandbox";
+import ModalManager from "../common/modals/ModalManager";
 
 function App() {
   const location = useLocation();
 
   return (
-    <Switch>
-      <Route exact path="/" component={HomePage}/>
-      {/* <Route path="/events" component={Events}/> */}
-      <Route exact path="/sandbox" component={Sandbox} />
-      <Route path={'/(.+)'} render={() => (
-        <Fragment>
-          <NavBar/>
-          <Container className='main'>
-            <Route exact path='/events' component={EventDashboard}/>        
-            <Route path='/events/:id' component={EventDetailedPage}/>
-            <Route path={['/create-event','/manage/:id']}>
-              <EventForm key={location.key}/>
-            </Route>
-          </Container>            
-        </Fragment>
-      )}>
-      </Route>        
-    </Switch>
+    <Fragment>
+      <ModalManager/> 
+      <Switch>      
+        <Route exact path="/" component={HomePage}/>
+        {/* <Route path="/events" component={Events}/> */}
+        <Route exact path="/sandbox" component={Sandbox} />
+        <Route path={'/(.+)'} render={() => (
+          <Fragment>
+            <NavBar/>
+            <Container className='main'>
+              <Route exact path='/events' component={EventDashboard}/>        
+              <Route path='/events/:id' component={EventDetailedPage}/>
+              <Route path={['/create-event','/manage/:id']}>
+                <EventForm key={location.key}/>
+              </Route>
+            </Container>            
+          </Fragment>
+        )}>
+        </Route>           
+      </Switch>  
+    </Fragment>
   );
 }
 
