@@ -2,7 +2,7 @@ import React from "react";
 import { FormField, Label, Select } from 'semantic-ui-react';
 import { useField } from 'formik';
 
-export default function SelectInput({label,options,...props}) {
+export default function SelectInput({label, options,...props}) {
   const [field, meta, helpers] = useField(props);
   const isError = meta.touched && !!meta.error;
 

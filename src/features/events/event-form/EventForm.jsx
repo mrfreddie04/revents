@@ -1,3 +1,4 @@
+/* global google */
 import React from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,13 +12,14 @@ import TextInput from '../../../app/common/form/text-input';
 import TextArea from '../../../app/common/form/text-area';
 import SelectInput from "../../../app/common/form/select-input";
 import DateInput from "../../../app/common/form/date-input";
+import PlaceInput from "../../../app/common/form/place-input";
 
 const initialEventValues = {
   title:'',
   category:'',
   description:'',
-  city:'',
-  venue:'',
+  city: {address:'',latlng: null},
+  venue: {address:'',latlng: null},
   date:''
 };
 
@@ -28,7 +30,7 @@ export default function EventForm() {
   const history = useHistory();
 
   const handleFormSubmit = (values) => {
-    //console.log(values);
+    console.log(values);
     event 
       ? dispatch(eventActions.updateEvent({...event,...values}))
       : dispatch(eventActions.createEvent({...values, id: cuid(), hostedBy: 'Bob', attendees: []}));
@@ -42,8 +44,13 @@ export default function EventForm() {
     title: Yup.string().required('You must provide a title'),
     category: Yup.string().required('You must provide a category'),
     description: Yup.string().required(),
-    city: Yup.string().required(),
-    venue: Yup.string().required(),
+    city: Yup.object().shape({
+      address:Yup.string().required('City is required')
+    }),
+    venue:  Yup.object().shape({
+      address:Yup.string().required('Venue is required')
+    }),
+    date: Yup.string().required(),
   })
 
   //console.log("Values",values);
@@ -57,15 +64,24 @@ export default function EventForm() {
           handleFormSubmit(values);
         }}
       > 
-        {({dirty, isSubmitting, isValid}) => (
+        {({dirty, isSubmitting, isValid, values}) => (
         <Form className="ui form">
           <Header sub color='teal' content='Event Details'/>
           <TextInput placeholder="Event title" name="title"/>
           <SelectInput placeholder="Category" name="category" options={categoryData}/>
           <TextArea placeholder="Description" name="description" rows={3}/>
           <Header sub color='teal' content='Event Location'/>
-          <TextInput placeholder="City" name="city"/>
-          <TextInput placeholder="Venue" name="venue" />
+          <PlaceInput placeholder="City" name="city"/>
+          <PlaceInput 
+            placeholder="Venue" 
+            name="venue" 
+            disabled={!values.city.latlng}
+            options={{
+              location: new google.maps.LatLng(values.city.latlng),
+              radius: 1000,
+              type: ['establishment']
+            }}
+          />
           <DateInput 
             placeholderText="Event Date" 
             name="date" 

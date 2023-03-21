@@ -19,11 +19,11 @@ function App() {
       <Switch>      
         <Route exact path="/" component={HomePage}/>
         {/* <Route path="/events" component={Events}/> */}
-        <Route exact path="/sandbox" component={Sandbox} />
         <Route path={'/(.+)'} render={() => (
           <Fragment>
             <NavBar/>
             <Container className='main'>
+              <Route exact path="/sandbox" component={Sandbox} />
               <Route exact path='/events' component={EventDashboard}/>        
               <Route path='/events/:id' component={EventDetailedPage}/>
               <Route path={['/create-event','/manage/:id']}>
