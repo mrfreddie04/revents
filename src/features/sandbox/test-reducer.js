@@ -1,3 +1,7 @@
+import { toast } from 'react-toastify';
+import { asyncActions } from '../../app/async/async-reducer';
+import { delay } from "../../app/common/util/util";
+
 const initialState = {
   data: 42
 };
@@ -8,8 +12,32 @@ const ActionTypes = {
 }
 
 export const actions = {
-  increment: (amount) => ({ type: ActionTypes.INCREMENT_COUNTER, payload: amount}),
-  decrement: (amount) => ({ type: ActionTypes.DECREMENT_COUNTER, payload: amount}),
+  increment: (amount) => {
+    return async(dispatch) => {
+      dispatch(asyncActions.asyncActionStart());
+      try {
+        await delay(1000);
+        dispatch({ type: ActionTypes.INCREMENT_COUNTER, payload: amount});
+        dispatch(asyncActions.asyncActionFinish());
+      } catch(error) {
+        dispatch(asyncActions.asyncActionError(error));
+      }
+    }    
+  },
+  decrement: (amount) => {
+    return async(dispatch) => {
+      dispatch(asyncActions.asyncActionStart());
+      try {
+        await delay(1000);
+        //throw 'ooops!'
+        dispatch({ type: ActionTypes.DECREMENT_COUNTER, payload: amount});
+        dispatch(asyncActions.asyncActionFinish());
+      } catch(error) {
+        dispatch(asyncActions.asyncActionError(error));
+        toast.error(error);
+      }
+    }        
+  }
 }
 
 export default function testReducer(state = initialState, action) {
@@ -22,3 +50,5 @@ export default function testReducer(state = initialState, action) {
       return state; //Or throw an error
   }
 }
+
+

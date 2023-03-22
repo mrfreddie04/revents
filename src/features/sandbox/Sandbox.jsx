@@ -15,18 +15,12 @@ const defaultProps = {
 };
 
 export default function Sandbox() {
-  const [map, setMap] = useState(true);
+  const [map, setMap] = useState(false);
   const [location, setLocation] = useState(defaultProps);
+  const [target, setTarget] = useState(null);
   const data = useSelector(state => state.test.data);
+  const {loading} = useSelector(state => state.async);
   const dispatch = useDispatch();
-
-  const handleIncrement = () => {
-    dispatch(actions.increment(10));
-  }
-
-  const handleDecrement = () => {
-    dispatch(actions.decrement(5));
-  }  
 
   const handleOpenModal = () => {
     dispatch(modalActions.openModal({
@@ -44,15 +38,34 @@ export default function Sandbox() {
     setLocation(location => ({...location, center: {lat, lng}}));
   }
 
+  const handleIncrement = (e) => {
+    dispatch(actions.increment(10));
+    setTarget(e.target.name);
+  }
+
+  const handleDecrement = (e) => {
+    dispatch(actions.decrement(5));
+    setTarget(e.target.name);
+  }  
+
   return(
     <>
       <h1>Testing 1,2,3</h1>
       <p>The data is: {data}</p>
       <div>
+        <Button onClick={handleIncrement} 
+          color='green' 
+          loading={loading && target === 'increment'} 
+          name='increment'
+        >Increment</Button>
+        <Button 
+          onClick={handleDecrement} 
+          color='blue' 
+          loading={loading && target === 'decrement'} 
+          name='decrement'
+        >Decrement</Button>
         <Button onClick={handleOpenModal} color='teal'>Open Test Modal</Button>
         <Button onClick={handleMap} color='grey'>Map</Button>
-        <Button onClick={handleIncrement} color='green'>Increment</Button>
-        <Button onClick={handleDecrement} color='blue'>Decrement</Button>
       </div>
       <div style={{marginTop:'15px'}}>
         <TestLocationSearchInput onCoords={handleCoords}/>

@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 import { Switch, Route, useLocation } from "react-router-dom";
 import { Container } from 'semantic-ui-react'
+import { ToastContainer } from 'react-toastify';
 import HomePage from './../../features/home/HomePage';
-//import Events from "../../features/events/Events";
 import EventDashboard from '../../features/events/event-dashboard/EventDashboard';
 import EventDetailedPage from '../../features/events/event-detailed/EventDetailedPage';
 import EventForm from "../../features/events/event-form/EventForm";
@@ -10,12 +10,13 @@ import NavBar from '../../features/nav/NavBar';
 import Sandbox from "../../features/sandbox/Sandbox";
 import ModalManager from "../common/modals/ModalManager";
 
-function App() {
+export default function App() {
   const location = useLocation();
 
   return (
     <Fragment>
-      <ModalManager/> 
+      <ModalManager/>-right 
+      <ToastContainer position='bottom-right' theme='colored' hideProgressBar/> 
       <Switch>      
         <Route exact path="/" component={HomePage}/>
         {/* <Route path="/events" component={Events}/> */}
@@ -37,6 +38,4 @@ function App() {
     </Fragment>
   );
 }
-
-export default App;
 
