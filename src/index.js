@@ -9,13 +9,13 @@ import './app/layout/styles.css';
 import App from './app/layout/App';
 import { configureStore } from './app/store/configure-store';
 import ScrollToTop from './app/layout/ScrollToTop';
-import { eventActions } from './features/events/event-actions';
+//import { eventActions } from './features/events/event-actions';
 
 const rootEl = document.getElementById('root');
 const store = configureStore();
 
 //test async data load
-store.dispatch(eventActions.fetchEvents());
+//store.dispatch(eventActions.fetchEvents());
 
 function render() {
   const root = ReactDOM.createRoot(rootEl);

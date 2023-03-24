@@ -1,6 +1,6 @@
 import { eventActionTypes } from "./event-action-types";
 //import { sampleData } from "../../app/api/sampleData";
-const { CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, FETCH_EVENTS } = eventActionTypes;
+const { CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, FETCH_EVENTS, FETCH_EVENT } = eventActionTypes;
 
 const initialState = {
   events: []
@@ -11,6 +11,8 @@ export default function eventReducer(state = initialState, {type, payload}) {
   switch(type) {
     case FETCH_EVENTS:
       return { ...state, events: [...payload]};     
+    case FETCH_EVENT:
+      return { ...state, events: [...events, payload]};           
     case CREATE_EVENT:
       return { ...state, events: [...events, payload]};  
     case UPDATE_EVENT:

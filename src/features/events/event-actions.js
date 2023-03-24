@@ -3,7 +3,7 @@ import { asyncActions } from '../../app/async/async-reducer';
 import { fetchSampleData } from "../../app/api/mockApi";
 
 const {asyncActionStart, asyncActionFinish, asyncActionError} = asyncActions;
-const {CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, FETCH_EVENTS} = eventActionTypes;
+const {CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, FETCH_EVENTS, FETCH_EVENT} = eventActionTypes;
 
 export const eventActions = {
   createEvent: (event) => ({ type: CREATE_EVENT, payload: event}),
@@ -20,5 +20,7 @@ export const eventActions = {
         dispatch(asyncActionError(error));
       }      
     }
-  }
+  },
+  listenToEvents: (events) => ({ type: FETCH_EVENTS, payload: events}),
+  listenToEvent: (event) => ({ type: FETCH_EVENT, payload: event}),
 }

@@ -9,6 +9,7 @@ import EventForm from "../../features/events/event-form/EventForm";
 import NavBar from '../../features/nav/NavBar';
 import Sandbox from "../../features/sandbox/Sandbox";
 import ModalManager from "../common/modals/ModalManager";
+import ErrorComponent from "../common/errors/ErrorComponent";
 
 export default function App() {
   const location = useLocation();
@@ -24,6 +25,7 @@ export default function App() {
           <Fragment>
             <NavBar/>
             <Container className='main'>
+              <Route exact path="/error" component={ErrorComponent} />
               <Route exact path="/sandbox" component={Sandbox} />
               <Route exact path='/events' component={EventDashboard}/>        
               <Route path='/events/:id' component={EventDetailedPage}/>
