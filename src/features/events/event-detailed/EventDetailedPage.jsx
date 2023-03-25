@@ -3,7 +3,7 @@ import { useParams, Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { Grid } from "semantic-ui-react";
 import { useFirestoreDoc } from '../../../app/hooks/useFirestoreDoc';
-import { listenToEventFromFirestore } from "../../../app/firestore/firestores-service";
+import { listenToEventFromFirestore } from "../../../app/firestore/firestore-service";
 import EventDetailedChat from "./EventDetailedChat";
 import EventDetailedHeader from "./EventDetailedHeader";
 import EventDetailedInfo from "./EventDetailedInfo";

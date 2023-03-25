@@ -13,10 +13,16 @@ export default function SignedOutMenu() {
     }));    
   }
 
+  const handleRegister = () => {
+    dispatch(modalActions.openModal({
+      modalType: 'RegisterForm'
+    }));    
+  }
+
   return(
     <Menu.Item position="right">
       <Button basic inverted content="Login" onClick={handleLogin}/>
-      <Button basic inverted content="Register" style={{marginLeft:"0.5em"}}/>
+      <Button basic inverted content="Register" style={{marginLeft:"0.5em"}} onClick={handleRegister}/>
     </Menu.Item>
   );
 };

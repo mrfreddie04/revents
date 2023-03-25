@@ -6,7 +6,7 @@ import EventFilters from "./EventFilters";
 //import LoadingComponent from "../../../app/layout/LoadingComponent";
 import EventList from "./EventList";
 import EventListItemPlaceholder from "./EventListItemPlaceholder";
-import { listenToEventsFromFirestore } from "../../../app/firestore/firestores-service";
+import { listenToEventsFromFirestore } from "../../../app/firestore/firestore-service";
 import { eventActions } from '../event-actions';
 
 const { listenToEvents } = eventActions;

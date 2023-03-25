@@ -23,13 +23,19 @@ firebase.initializeApp(firebaseConfig);
 // It returns an object we can use to interact with Firebase services
 const db = firebase.firestore(); //firestore (db)
 const projectDatabase = firebase.database(); //realtime (db)
-const projectAuth = firebase.auth(); //Authentication
+const auth = firebase.auth(); //Authentication
 const projectStorage = firebase.storage(); //Storage
+
 
 //timestamp - alias for firebase.firestore.Timestamp function
 //it created timestamp data property
 const Timestamp = firebase.firestore.Timestamp;
 const FieldValue = firebase.firestore.FieldValue;
+const FacebookAuthProvider =  firebase.auth.FacebookAuthProvider
+const GoogleAuthProvider =  firebase.auth.GoogleAuthProvider
 
 export default firebase;
-export { db, projectDatabase, projectAuth, projectStorage, Timestamp, FieldValue };
+export { 
+  db, projectDatabase, auth, projectStorage, 
+  Timestamp, FieldValue, FacebookAuthProvider, GoogleAuthProvider 
+};

@@ -1,28 +1,40 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Menu, Image, Dropdown } from 'semantic-ui-react';
-import { authActions } from '../../features/auth/auth-reducer';
+import { toast } from 'react-toastify';
+//import { authActions } from '../../features/auth/auth-actions';
+import { signOut } from "../../app/firestore/firebase-service";
+
+//const { signOutUser } = authActions;
 
 export default function SignedInMenu() {
   const { currentUser } = useSelector(state => state.auth);
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
   const history = useHistory();
 
-  const { email, photoURL } = currentUser;
+  const { email, photoURL, displayName } = currentUser;
 
-  const handleSignOut = () => {
-    dispatch(authActions.signOutUser());
-    history.push("/");
+  //console.log("SIM", email, photoURL);
+
+  const handleSignOut = async () => {
+    //dispatch(signOutUser());
+    try {
+      history.push("/");
+      await signOut();
+    } catch(error) {
+      toast.error(error);
+    }
   }
 
   return(
     <Menu.Item position="right">
       <Image avatar spaced='right' src={ photoURL || '/assets/user.png' } alt='User image' />
-      <Dropdown pointing='top left' text={email}>
+      <Dropdown pointing='top left' text={displayName || email}>
         <Dropdown.Menu>
           <Dropdown.Item as={Link} to='/create-event' text='Create Event' icon='plus'/>
           <Dropdown.Item text='My profie' icon='user'/>
+          <Dropdown.Item text='My account' icon='settings' as={Link} to='/account' />
           <Dropdown.Item text='Sign out' icon='power' onClick={handleSignOut}/>
         </Dropdown.Menu>
       </Dropdown>

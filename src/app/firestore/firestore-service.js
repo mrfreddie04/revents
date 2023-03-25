@@ -43,6 +43,15 @@ export function cancelEventToggle(event) {
   });
 }
 
+export function setUserProfileData(user) {
+  return db.collection("users").doc(user.uid).set({
+    displayName: user.displayName,
+    email: user.email,
+    photoURL: user.photoURL || null,
+    createdAt: FieldValue.serverTimestamp() //Timestamp.fromDate(new Date())
+  });
+}
+
 export function dataToSnapshot(data) {
   //convert firebase.firestore.Timestamp to js Date type
   for (const key in data) {
