@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import { auth, GoogleAuthProvider, FacebookAuthProvider } from "../config/firebase";
 import { setUserProfileData } from "./firebase-db-service";
 
@@ -51,6 +50,6 @@ export async function socialLogin(selectedProvider) {
       await setUserProfileData(result.user);
     }
   } catch(error) {
-    toast.error(error.message);
+    throw error;    
   }
 }

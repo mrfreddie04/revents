@@ -36,7 +36,6 @@ export function deleteEventInFirestore(event) {
   return db.collection("events").doc(event.id).delete();;
 }
 
-
 export function cancelEventToggle(event) {
   return db.collection("events").doc(event.id).update({
     isCancelled: !event.isCancelled
@@ -70,6 +69,44 @@ export async function updateUserProfile(profile) {
   }
 }
 
+export async function updateUserProfilePhoto(downloadURL, filename) {
+  const user = auth.currentUser;
+  const userDocRef = db.collection("users").doc(user.uid);
+  try {
+    const userDoc = await userDocRef.get();
+    if(!userDoc.data().photoURL) {
+      await userDocRef.update({photoURL: downloadURL});
+      await user.updateProfile({photoURL: downloadURL});
+    }
+    await userDocRef.collection('photos').add({name:filename, url: downloadURL});
+  } catch(error) {
+    throw error;
+  }  
+}  
+
+export async function deleteUserProfilePhoto(photoid) {
+  const { uid } = auth.currentUser;
+  try {
+    await db.collection("users").doc(uid).collection('photos').doc(photoid).delete();
+  } catch(error) {
+    throw error;
+  }  
+}  
+
+export function getUserPhotos(uid) {
+  return db.collection("users").doc(uid).collection("photos");
+}  
+
+export async function setMainPhoto(photo) {
+  const user = auth.currentUser;
+  try {
+    const userDocRef = db.collection("users").doc(user.uid);  
+    await userDocRef.update({photoURL: photo.url});
+    return await user.updateProfile({photoURL: photo.url});
+  } catch(error) {
+    throw error;
+  }  
+}  
 
 export function dataToSnapshot(data) {
   //convert firebase.firestore.Timestamp to js Date type

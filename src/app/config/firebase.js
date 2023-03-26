@@ -1,7 +1,13 @@
 //import firebase CORE
 import firebase from "firebase/compat/app"; 
+// import firebase from "firebase/app"; 
 
 //import services we want to use
+// import "firebase/firestore";    //firestore database
+// import "firebase/database";     //realtime database - we will use for chat
+// import "firebase/auth";         //firestore authentication services
+// import "firebase/storage";      //firebase storage
+
 import "firebase/compat/firestore";    //firestore database
 import "firebase/compat/database";     //realtime database - we will use for chat
 import "firebase/compat/auth";         //firestore authentication services
@@ -22,9 +28,9 @@ firebase.initializeApp(firebaseConfig);
 // Initialize Firebase services that we want to use
 // It returns an object we can use to interact with Firebase services
 const db = firebase.firestore(); //firestore (db)
-const projectDatabase = firebase.database(); //realtime (db)
+const realtime = firebase.database(); //realtime (db)
 const auth = firebase.auth(); //Authentication
-const projectStorage = firebase.storage(); //Storage
+const storage = firebase.storage(); //Storage
 
 
 //timestamp - alias for firebase.firestore.Timestamp function
@@ -36,6 +42,6 @@ const GoogleAuthProvider =  firebase.auth.GoogleAuthProvider
 
 export default firebase;
 export { 
-  db, projectDatabase, auth, projectStorage, 
+  db, realtime, auth, storage, 
   Timestamp, FieldValue, FacebookAuthProvider, GoogleAuthProvider 
 };

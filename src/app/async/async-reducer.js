@@ -18,13 +18,6 @@ export const asyncActions = {
   asyncActionFinish: () => ({type:ASYNC_ACTION_FINISH}),
   asyncActionError: (error) => ({type:ASYNC_ACTION_ERROR, payload: error}),
   asyncActionInitialized: () => ({type:APP_LOADED}),
-  // asyncActionStart: () => {
-  //   return async(dispatch) => {
-  //     dispatch({type:ASYNC_ACTION_START});
-  //     await delay(1000);
-  //     dispatch({type:ASYNC_ACTION_FINISH});
-  //   }
-  // },
 }
 
 export default function asyncReducer(state = initialState, {type, payload}) {

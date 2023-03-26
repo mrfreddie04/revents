@@ -37,7 +37,7 @@ export default function EventForm() {
   const [ loadingCancel, setLoadingCancel] = useState(false);
   const [ confirmOpen, setConfirmOpen] = useState(false);
   const { id } = useParams();
-  const event = useSelector( store => store.event.events.find( event => event.id === id))
+  const event = useSelector( state => state.event.events.find( event => event.id === id))
   const { loading, error } = useSelector(state => state.async);
   const dispatch = useDispatch();
   const history = useHistory();

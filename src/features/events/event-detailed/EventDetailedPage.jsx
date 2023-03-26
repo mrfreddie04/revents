@@ -16,8 +16,8 @@ const { listenToEvents } = eventActions;
 
 export default function EventDetailedPage() {
   const { id } = useParams();
-  const event = useSelector( store => {
-    return store.event.events.find( event => event.id === id);}
+  const event = useSelector( state => {
+    return state.event.events.find( event => event.id === id);}
   );
   const { loading, error } = useSelector(state => state.async);
   const dispatch = useDispatch();

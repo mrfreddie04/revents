@@ -2,6 +2,7 @@ import React from "react";
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Button } from "semantic-ui-react";
+import { toast } from "react-toastify";
 import { socialLogin } from "../../app/firestore/firebase-auth-service";
 import { modalActions } from "../../app/common/modals/modal-reducer";
 
@@ -13,14 +14,24 @@ export default function SocialLogin() {
 
   const handleLoginFacebook = async () => {
     dispatch(closeModal());
-    await socialLogin('facebook');
-    history.push('/events');  
+    try {
+      await socialLogin('facebook');
+    } catch(error) {
+      toast.error(error.message);
+    } finally {
+      history.push('/events');  
+    }
   }
 
   const handleLoginGoogle = async () => {
     dispatch(closeModal());
-    await socialLogin('google');
-    history.push('/events');  
+    try {
+      await socialLogin('google');
+    } catch(error) {
+      toast.error(error.message);
+    } finally {
+      history.push('/events');  
+    }
   }
 
   return (

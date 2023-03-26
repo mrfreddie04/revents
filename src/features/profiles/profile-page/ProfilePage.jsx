@@ -3,7 +3,6 @@ import { useParams, Redirect } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { Grid } from 'semantic-ui-react';
 import { useFirestoreDoc } from '../../../app/hooks/useFirestoreDoc';
-// import { toast } from 'react-toastify';
 import { getUserProfile } from "../../../app/firestore/firebase-db-service";
 import { profileActions } from '../profile-actions';
 import ProfileHeader from "./ProfileHeader";
@@ -15,7 +14,7 @@ const { listenToSelectedUserProfile } = profileActions;
 export default function ProfilePage() {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { selectedUserProfile } = useSelector(store => store.profile);
+  const { selectedUserProfile } = useSelector(state => state.profile);
   const { currentUser } = useSelector(state => state.auth);
   const { loading, error } = useSelector(state => state.async);
 
@@ -25,7 +24,7 @@ export default function ProfilePage() {
     deps: [dispatch, id]
   });    
 
-  if(loading || (!selectedUserProfile && !error)) {
+  if((loading && !selectedUserProfile) || (!selectedUserProfile && !error)) {
     return <LoadingComponent content="Loading user profile..."/>
   }
 
