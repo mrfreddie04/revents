@@ -7,7 +7,7 @@ import { Button, Label, Divider } from "semantic-ui-react";
 import ModalWrapper from "../../app/common/modals/ModalWrapper";
 import TextInput from '../../app/common/form/text-input';
 import { modalActions } from "../../app/common/modals/modal-reducer";
-import { registerWithEmail } from "../../app/firestore/firebase-service";
+import { registerWithEmail } from "../../app/firestore/firebase-auth-service";
 import { delay } from "../../app/common/util/util";
 import SocialLogin from "./SocialLogin";
 

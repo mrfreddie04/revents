@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { auth, GoogleAuthProvider, FacebookAuthProvider } from "../config/firebase";
-import { setUserProfileData } from "./firestore-service";
+import { setUserProfileData } from "./firebase-db-service";
 
 export function signInWithEmail(creds) {
   return auth.signInWithEmailAndPassword(creds.email, creds.password);

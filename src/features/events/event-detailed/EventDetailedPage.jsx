@@ -3,7 +3,7 @@ import { useParams, Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { Grid } from "semantic-ui-react";
 import { useFirestoreDoc } from '../../../app/hooks/useFirestoreDoc';
-import { listenToEventFromFirestore } from "../../../app/firestore/firestore-service";
+import { listenToEventFromFirestore } from "../../../app/firestore/firebase-db-service";
 import EventDetailedChat from "./EventDetailedChat";
 import EventDetailedHeader from "./EventDetailedHeader";
 import EventDetailedInfo from "./EventDetailedInfo";
@@ -17,7 +17,6 @@ const { listenToEvents } = eventActions;
 export default function EventDetailedPage() {
   const { id } = useParams();
   const event = useSelector( store => {
-    //console.log("EDP-S",store.event.events)
     return store.event.events.find( event => event.id === id);}
   );
   const { loading, error } = useSelector(state => state.async);
@@ -28,8 +27,6 @@ export default function EventDetailedPage() {
     data: (event) => dispatch(listenToEvents([event])),
     deps: [dispatch, id]
   });  
-  
-  //console.log("ERROR", error);
 
   //display loading indicator if data is being loaded or event is null
   if (loading || (!event && !error)) return <LoadingComponent content='Loading event...' />;

@@ -8,7 +8,7 @@ import ModalWrapper from "../../app/common/modals/ModalWrapper";
 import TextInput from '../../app/common/form/text-input';
 //import { authActions } from './auth-actions';
 import { modalActions } from "../../app/common/modals/modal-reducer";
-import { signInWithEmail } from "../../app/firestore/firebase-service";
+import { signInWithEmail } from "../../app/firestore/firebase-auth-service";
 import { delay } from "../../app/common/util/util";
 import SocialLogin from "./SocialLogin";
 

@@ -12,6 +12,7 @@ import Sandbox from "../../features/sandbox/Sandbox";
 import ModalManager from "../common/modals/ModalManager";
 import ErrorComponent from "../common/errors/ErrorComponent";
 import AccountPage from "../../features/auth/AccountPage";
+import ProfilePage from "../../features/profiles/profile-page/ProfilePage";
 import LoadingComponent from "./LoadingComponent.jsx";
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
               <Route exact path="/sandbox" component={Sandbox} />
               <Route exact path='/events' component={EventDashboard}/>     
               <Route exact path="/account" component={AccountPage} />   
+              <Route path="/profile/:id" component={ProfilePage} />   
               <Route path='/events/:id' component={EventDetailedPage}/>
               <Route path={['/create-event','/manage/:id']}>
                 <EventForm key={location.key}/>

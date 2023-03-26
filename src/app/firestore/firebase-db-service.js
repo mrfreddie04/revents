@@ -1,5 +1,5 @@
 import cuid from "cuid";
-import { db, Timestamp, FieldValue } from "../config/firebase";
+import { db, auth, Timestamp, FieldValue } from "../config/firebase";
 
 export function listenToEventsFromFirestore() {
   //return collection reference
@@ -51,6 +51,25 @@ export function setUserProfileData(user) {
     createdAt: FieldValue.serverTimestamp() //Timestamp.fromDate(new Date())
   });
 }
+
+export function getUserProfile(uid) {
+  //return collection reference
+  return db.collection("users").doc(uid);
+}  
+
+export async function updateUserProfile(profile) {
+  const user = auth.currentUser;
+  //if(user.uid !== profile.id) return;
+  try {
+    if(user.displayName !== profile.displayName) {
+      await user.updateProfile({displayName: profile.displayName});
+    }
+    return await db.collection("users").doc(user.uid).update(profile);
+  } catch(error) {
+    throw error;
+  }
+}
+
 
 export function dataToSnapshot(data) {
   //convert firebase.firestore.Timestamp to js Date type

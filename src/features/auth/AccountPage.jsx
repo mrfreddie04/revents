@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { Formik, Form } from "formik";
 import * as Yup from 'yup';
 import { Header, Segment, Button, Label } from "semantic-ui-react";
-import { updateUserPassword } from '../../app/firestore/firebase-service';
+import { updateUserPassword } from '../../app/firestore/firebase-auth-service';
 import TextInput from '../../app/common/form/text-input';
 import { delay } from "../../app/common/util/util";
 

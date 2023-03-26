@@ -12,7 +12,6 @@ export default function PlaceInput({label, options, ...props}) {
   const isError = meta.touched && !!meta.error;
 
   const handleSelect = address => {
-    //console.log("Address", address);
     geocodeByAddress(address)
       .then(results => getLatLng(results[0]))
       .then(latlng => helpers.setValue({address, latlng}))
@@ -26,7 +25,6 @@ export default function PlaceInput({label, options, ...props}) {
   const handleBlur = (e) => {
     field.onBlur(e);
     if(!field.value.latlng) {
-      //console.log("TEST", field.value)
       helpers.setValue({address:'', latlng: null}); //will trigger error
     }
     //helpers.setTouched(true); //taken care by field.onBlur(e);

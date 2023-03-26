@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { dataFromSnapshot } from "../firestore/firestore-service";
+import { dataFromSnapshot } from "../firestore/firebase-db-service";
 import { asyncActions } from '../async/async-reducer';
 
 const { asyncActionStart, asyncActionFinish, asyncActionError} = asyncActions;

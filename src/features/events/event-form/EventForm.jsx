@@ -14,7 +14,7 @@ import {
   updateEventInFirestore,
   addEventToFirestore,
   cancelEventToggle
-} from "../../../app/firestore/firestore-service";
+} from "../../../app/firestore/firebase-db-service";
 import TextInput from '../../../app/common/form/text-input';
 import TextArea from '../../../app/common/form/text-area';
 import SelectInput from "../../../app/common/form/select-input";

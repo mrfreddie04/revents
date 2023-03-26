@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { Segment, Grid, Icon, Button } from 'semantic-ui-react';
 import { format } from 'date-fns';
-import EventDetailedMap from "./EVentDetailedMap";
+import EventDetailedMap from "./EventDetailedMap";
 
 export default function EventDetailedInfo({event}) {
   const [mapOpen, setMapOpen] = useState(false);

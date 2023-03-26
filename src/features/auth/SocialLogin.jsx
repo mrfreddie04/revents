@@ -2,7 +2,7 @@ import React from "react";
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Button } from "semantic-ui-react";
-import { socialLogin } from "../../app/firestore/firebase-service";
+import { socialLogin } from "../../app/firestore/firebase-auth-service";
 import { modalActions } from "../../app/common/modals/modal-reducer";
 
 const { closeModal } = modalActions;
