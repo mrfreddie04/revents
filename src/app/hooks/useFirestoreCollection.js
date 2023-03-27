@@ -13,6 +13,7 @@ export function useFirestoreCollection({query, data, deps }) {
     const unsub = query().onSnapshot({
       next: (snapshot) => {
         const docs = snapshot.docs.map( doc => dataFromSnapshot(doc));
+        //console.log(docs);
         data(docs);
         dispatch(asyncActionFinish());        
       },

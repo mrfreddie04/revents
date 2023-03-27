@@ -1,9 +1,47 @@
-import cuid from "cuid";
 import { db, auth, Timestamp, FieldValue } from "../config/firebase";
 
-export function listenToEventsFromFirestore() {
+export function listenToEventsFromFirestore(predicate) {
+  const user = auth.currentUser;
+  const filter = predicate.get('filter');
+  const startDate = predicate.get('startDate');
+
   //return collection reference
-  return db.collection("events").orderBy('date');
+  const eventsRef = db.collection("events").orderBy('date'); //.orderBy('date'); //
+  switch(filter) {
+    case 'isHosting':
+      return eventsRef
+        .where('hostUid', '==', user.uid)
+        .where('date', '>=', startDate);
+    case 'isGoing':  
+      return eventsRef
+        .where("attendeeIds", "array-contains", user.uid)
+        .where('date', '>=', startDate);
+    default:
+      return eventsRef.where('date', '>=', startDate);  
+  }
+}  
+
+export function getUserEvents(uid, filter) {
+  const eventsRef = db.collection("events");
+  const today = new Date();
+  switch(filter) {
+    case 'future':
+      return eventsRef
+        .where("attendeeIds", "array-contains", uid)
+        .where('date', '>', today)
+        .orderBy('date');
+    case 'past':  
+      return eventsRef
+        .where("attendeeIds", "array-contains", uid)
+        .where('date', '<=', today)
+        .orderBy('date', 'desc');
+    case 'hosting':
+      return eventsRef
+        .where('hostUid', '==', uid)
+        .orderBy('date');
+    default:
+      return eventsRef;  
+  }  
 }  
 
 export function listenToEventFromFirestore(id) {
@@ -12,18 +50,18 @@ export function listenToEventFromFirestore(id) {
 }  
 
 export function addEventToFirestore(event) {
-  //get reference to the collection
-  //const doc = dataToSnapshot(event);
-
+  const user = auth.currentUser;
   return db.collection("events").add({
     ...event,
-    hostedBy: 'Diana',
-    hostPhotoURL: 'https://randomuser.me/api/portraits/women/22.jpg',
+    hostUid: user.uid,
+    hostedBy: user.displayName,
+    hostPhotoURL: user.photoURL || null,
     attendees: FieldValue.arrayUnion({
-      id: cuid(),
-      displayName: 'Diana',
-      photoURL: 'https://randomuser.me/api/portraits/women/22.jpg'
-    })
+      id: user.uid,
+      displayName: user.displayName,
+      photoURL: user.photoURL || null
+    }),
+    attendeeIds: FieldValue.arrayUnion(user.uid)  
   });
 }
 
@@ -107,6 +145,33 @@ export async function setMainPhoto(photo) {
     throw error;
   }  
 }  
+
+export function addEventAttendee(event) {
+  const user = auth.currentUser;
+  const eventDocRef = db.collection("events").doc(event.id);
+  return eventDocRef.update({
+    attendees: FieldValue.arrayUnion({
+      id: user.uid,
+      displayName: user.displayName,
+      photoURL: user.photoURL || null
+    }),
+    attendeeIds: FieldValue.arrayUnion(user.uid)  
+  });
+}
+
+export async function removeEventAttendee(event) {
+  const user = auth.currentUser;
+  const eventDocRef = db.collection("events").doc(event.id);
+  try {
+    const eventDoc = await eventDocRef.get();
+    return eventDocRef.update({
+      attendees: eventDoc.data().attendees.filter(a => a.id !== user.uid),
+      attendeeIds: FieldValue.arrayRemove(user.uid)  
+    });
+  } catch(error) {
+    throw error;
+  }
+}
 
 export function dataToSnapshot(data) {
   //convert firebase.firestore.Timestamp to js Date type

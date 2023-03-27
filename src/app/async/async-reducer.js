@@ -16,7 +16,10 @@ const initialState = {
 export const asyncActions = {
   asyncActionStart: () => ({type:ASYNC_ACTION_START}),
   asyncActionFinish: () => ({type:ASYNC_ACTION_FINISH}),
-  asyncActionError: (error) => ({type:ASYNC_ACTION_ERROR, payload: error}),
+  asyncActionError: (error) => {
+    console.log(error);
+    return {type:ASYNC_ACTION_ERROR, payload: error};
+  },
   asyncActionInitialized: () => ({type:APP_LOADED}),
 }
 

@@ -28,6 +28,7 @@ const verifyAuth = () =>
         });  
       } else {
         dispatch(signOutUser());
+        dispatch(listenToCurrentUserProfile(null));
         dispatch(asyncActionInitialized());
       }
       //unsub();

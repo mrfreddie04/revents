@@ -15,12 +15,14 @@ import { eventActions } from '../event-actions';
 const { listenToEvents } = eventActions;
 
 export default function EventDetailedPage() {
-  const { id } = useParams();
-  const event = useSelector( state => {
-    return state.event.events.find( event => event.id === id);}
-  );
-  const { loading, error } = useSelector(state => state.async);
   const dispatch = useDispatch();
+  const { id } = useParams();
+  const event = useSelector( state => state.event.events.find( event => event.id === id));
+  const { loading, error } = useSelector(state => state.async);
+  const { authenticated, currentUser } = useSelector(state => state.auth);
+
+  const isHost = !!(currentUser?.uid === event?.hostUid);
+  const isGoing = !!(event?.attendees.some( a => a.id === currentUser?.uid));
 
   useFirestoreDoc({
     query: () => listenToEventFromFirestore(id),
@@ -38,12 +40,12 @@ export default function EventDetailedPage() {
   return (
     <Grid>
       <Grid.Column width={10}>       
-        <EventDetailedHeader event={event}/>
+        <EventDetailedHeader event={event} isGoing={isGoing} isHost={isHost} isAuth={authenticated}/>
         <EventDetailedInfo event={event}/>
         <EventDetailedChat/>
       </Grid.Column>
       <Grid.Column width={6}>
-        <EventDetailedSidebar attendees={event.attendees}/>
+        <EventDetailedSidebar attendees={event.attendees} hostUid={event.hostUid}/>
       </Grid.Column>
     </Grid>
   )

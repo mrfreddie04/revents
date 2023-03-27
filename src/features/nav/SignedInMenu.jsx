@@ -13,6 +13,8 @@ export default function SignedInMenu() {
   //const dispatch = useDispatch();
   const history = useHistory();
 
+  if(!currentUserProfile) return null;
+
   const { email, photoURL, displayName, id } = currentUserProfile;
 
   const handleSignOut = async () => {
