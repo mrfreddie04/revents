@@ -3,7 +3,10 @@ import { asyncActions } from '../../app/async/async-reducer';
 import { fetchSampleData } from "../../app/api/mockApi";
 
 const {asyncActionStart, asyncActionFinish, asyncActionError} = asyncActions;
-const {CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, FETCH_EVENTS, FETCH_EVENT} = eventActionTypes;
+const {
+  CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, FETCH_EVENTS, FETCH_EVENT,
+  LISTEN_TO_EVENT_CHAT, CLEAR_COMMENTS
+} = eventActionTypes;
 
 export const eventActions = {
   createEvent: (event) => ({ type: CREATE_EVENT, payload: event}),
@@ -23,4 +26,6 @@ export const eventActions = {
   },
   listenToEvents: (events) => ({ type: FETCH_EVENTS, payload: events}),
   listenToEvent: (event) => ({ type: FETCH_EVENT, payload: event}),
+  listenToEventChat: (comments) => ({ type: LISTEN_TO_EVENT_CHAT, payload: comments}),
+  clearComments: () => ({ type: CLEAR_COMMENTS}),
 }

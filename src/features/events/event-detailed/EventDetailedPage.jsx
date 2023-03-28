@@ -42,7 +42,7 @@ export default function EventDetailedPage() {
       <Grid.Column width={10}>       
         <EventDetailedHeader event={event} isGoing={isGoing} isHost={isHost} isAuth={authenticated}/>
         <EventDetailedInfo event={event}/>
-        <EventDetailedChat/>
+        <EventDetailedChat event={event}/>
       </Grid.Column>
       <Grid.Column width={6}>
         <EventDetailedSidebar attendees={event.attendees} hostUid={event.hostUid}/>
