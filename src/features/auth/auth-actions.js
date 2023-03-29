@@ -39,5 +39,5 @@ const verifyAuth = () =>
 export const authActions = {
   signInUser: signInUser,
   verifyAuth: verifyAuth,
-  signOutUser: signInUser
+  signOutUser: signOutUser
 }

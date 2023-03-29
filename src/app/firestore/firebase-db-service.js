@@ -173,6 +173,89 @@ export async function removeEventAttendee(event) {
   }
 }
 
+export async function followUser(profile) {
+  const user = auth.currentUser;
+  const batch = db.batch();
+  //current user is following profile user
+  try {
+    batch.set(
+      db.collection("following").doc(user.uid).collection("following").doc(profile.id),
+      {
+        displayName: profile.displayName,
+        photoURL: profile.photoURL,
+        uid: profile.id
+      }
+    );
+    // batch.set(
+    //   db.collection("following").doc(profile.id).collection("followers").doc(user.uid),
+    //   {
+    //     displayName: user.displayName,
+    //     photoURL: user.photoURL,
+    //     uid: user.uid
+    //   }
+    // );
+    batch.update(
+      db.collection("users").doc(user.uid),
+      { followingCount: FieldValue.increment(1) }
+    );
+    // batch.update(
+    //   db.collection("users").doc(profile.id),
+    //   { followersCount: FieldValue.increment(1) }  
+    // );    
+    return await batch.commit();
+  } catch (error) {
+    //automatic rollback
+    throw error;
+  }
+}
+
+export async function unfollowUser(profile) {
+  const user = auth.currentUser;
+  const batch = db.batch();
+  //current user is following profile user
+  try {
+    batch.delete(db.collection("following").doc(user.uid).collection("following").doc(profile.id));
+    //batch.delete(db.collection("following").doc(profile.id).collection("followers").doc(user.uid));
+    batch.update(
+      db.collection("users").doc(user.uid),
+      { followingCount: FieldValue.increment(-1) }
+    );
+    // batch.update(
+    //   db.collection("users").doc(profile.id),
+    //   { followersCount: FieldValue.increment(-1) }  
+    // );  
+    return await batch.commit();    
+    // await db.collection("following").doc(user.uid).collection("following").doc(profile.id).delete();
+    // await db.collection("following").doc(profile.id).collection("followers").doc(user.uid).delete();
+    // await db.collection("users").doc(user.uid).update({
+    //   followingCount: FieldValue.increment(-1)
+    // });
+    // await db.collection("users").doc(profile.id).update({
+    //   followersCount: FieldValue.increment(-1)
+    // });    
+  } catch (error) {
+    throw error;
+  }
+}
+
+export function getFollowers(profileId) {
+  return db.collection("following").doc(profileId).collection("followers");
+}  
+
+export function getFollowing(profileId) {
+  return db.collection("following").doc(profileId).collection("following");
+}  
+
+export async function isFollowing(profileId) {
+  const user = auth.currentUser;
+  try {
+    const doc = await db.collection("following").doc(user.uid).collection("following").doc(profileId).get();
+    return doc.exists;
+  } catch (error) {
+    throw error;
+  }
+}  
+
 export function dataToSnapshot(data) {
   //convert firebase.firestore.Timestamp to js Date type
   for (const key in data) {

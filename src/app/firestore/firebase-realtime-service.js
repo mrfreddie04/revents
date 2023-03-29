@@ -19,6 +19,11 @@ export function getEventChatComments(eventid) {
   return realtime.ref(`chat/${eventid}`).orderByKey();
 }  
 
+export function getUserFeed() {
+  const user = auth.currentUser; 
+  return realtime.ref(`posts/${user.uid}`).orderByKey().limitToLast(5);
+}  
+
 export function firebaseObjectToArray(snapshot) {
   return Object.entries(snapshot.val()).map(([key,value]) => {
     return {...value, id:key};

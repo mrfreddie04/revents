@@ -20,7 +20,7 @@ export function useFirebaseCollection({ref, data, deps, dispose }) {
       (err) => dispatch(asyncActionError(err)),
     ); 
     
-    return ()=>{
+    return () => {
       if(dispose) dispose();
       ref().off();
     };  
