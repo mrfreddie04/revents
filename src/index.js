@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+//import { Router } from 'react-router-dom';
+import { ConnectedRouter } from 'connected-react-router';
 import { Provider } from 'react-redux';
 import 'semantic-ui-css/semantic.min.css';
 import 'react-toastify/dist/ReactToastify.min.css';
 import 'react-calendar/dist/Calendar.css';
 import './app/layout/styles.css';
 import App from './app/layout/App';
-import { configureStore } from './app/store/configure-store';
+import { configureStore, history } from './app/store/configure-store';
 import ScrollToTop from './app/layout/ScrollToTop';
 //import { eventActions } from './features/events/event-actions';
+
 
 const rootEl = document.getElementById('root');
 const store = configureStore();
@@ -21,10 +23,10 @@ function render() {
   const root = ReactDOM.createRoot(rootEl);
   root.render(
     <Provider store={store}>
-      <BrowserRouter>
+      <ConnectedRouter history={history}>
         <ScrollToTop/>
         <App />
-      </BrowserRouter>
+      </ConnectedRouter>
     </Provider>
   );
 }

@@ -5,11 +5,16 @@ import { asyncActions } from '../async/async-reducer';
 
 const { asyncActionStart, asyncActionFinish, asyncActionError} = asyncActions;
 
-export function useFirestoreCollection({query, data, deps }) {
+export function useFirestoreCollection({query, data, deps, shouldExecute = true }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if(!shouldExecute) return;  
+      
     dispatch(asyncActionStart());
+    
+    //console.log("FC", query);
+
     const unsub = query().onSnapshot({
       next: (snapshot) => {
         const docs = snapshot.docs.map( doc => dataFromSnapshot(doc));

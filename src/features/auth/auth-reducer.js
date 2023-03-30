@@ -1,10 +1,12 @@
 import { authActionTypes } from "./auth-action-types";
-
+import { LOCATION_CHANGE } from "connected-react-router";
 const { SIGN_IN_USER, SIGN_OUT_USER } = authActionTypes;
 
 const initialState = {
   authenticated: false,
-  currentUser: null
+  currentUser: null,
+  prevLocation: null,
+  currentLocation: null
 };
 
 export default function authReducer(state = initialState, {type, payload}) {
@@ -20,6 +22,12 @@ export default function authReducer(state = initialState, {type, payload}) {
       } };  
     case SIGN_OUT_USER :
       return { ...state, ...initialState };  
+    case LOCATION_CHANGE:
+      return { 
+          ...state, 
+          prevLocation: state.currentLocation, 
+          currentLocation: payload.location 
+        };  
     default:
       return state; 
   }

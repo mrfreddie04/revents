@@ -6,8 +6,10 @@ import modalReducer from '../common/modals/modal-reducer';
 import authReducer from '../../features/auth/auth-reducer';
 import profileReducer from '../../features/profiles/profile-reducer';
 import asyncReducer from '../async/async-reducer';
+import {connectRouter} from 'connected-react-router';
 
-export const rootReducer = combineReducers({
+export const rootReducer = (history) => combineReducers({
+  router: connectRouter(history),
   test: testReducer,
   event: eventReducer,
   modal: modalReducer,

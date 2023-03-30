@@ -5,10 +5,12 @@ import { asyncActions } from '../async/async-reducer';
 
 const { /*asyncActionStart, asyncActionFinish,*/ asyncActionError} = asyncActions;
 
-export function useFirebaseCollection({ref, data, deps, dispose }) {
+export function useFirebaseCollection({ref, data, deps, dispose, shouldExecute = true}) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if(!shouldExecute) return;  
+
     //dispatch(asyncActionStart());
     ref().on('value',
       (snapshot) => {

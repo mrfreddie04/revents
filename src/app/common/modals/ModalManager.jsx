@@ -10,7 +10,7 @@ export default function ModalManager() {
   const modalLookup = {
     'TestModal': TestModal,
     'LoginForm': LoginForm,
-    'RegisterForm': RegisterForm,
+    'RegisterForm': RegisterForm
   };
   const currentModal = useSelector(state => state.modal);
   let renderedModal = null;
@@ -19,6 +19,7 @@ export default function ModalManager() {
     const {modalType, modalProps} = currentModal;
     const ModalComponent = modalLookup[modalType];
     renderedModal = <span><ModalComponent {...modalProps}/></span>
+    //console.log("MM")
   }
 
   //return renderedModal;

@@ -13,8 +13,10 @@ import "firebase/compat/database";     //realtime database - we will use for cha
 import "firebase/compat/auth";         //firestore authentication services
 import "firebase/compat/storage";      //firebase storage
 
+//console.log(process.env.REACT_APP_API_KEY)
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDalMkLk4zEtSwZIBGIMH7yPct7JupSfr0",
+  apiKey: process.env.REACT_APP_API_KEY,
   authDomain: "revents-db-46d95.firebaseapp.com",
   projectId: "revents-db-46d95",
   storageBucket: "revents-db-46d95.appspot.com",

@@ -17,12 +17,12 @@ const signInUser = (user) => ({ type: SIGN_IN_USER, payload: user });
 const verifyAuth = () => 
 {
   return (dispatch) => {
-    //const unsub = 
+    let profileUnsub;
     auth.onAuthStateChanged( (user) => {      
       if(user) {
         dispatch(signInUser(user));
         const profileRef = getUserProfile(user.uid);
-        profileRef.onSnapshot((snapshot) => {
+        profileUnsub = profileRef.onSnapshot((snapshot) => {
           dispatch(listenToCurrentUserProfile(dataFromSnapshot(snapshot)));
           dispatch(asyncActionInitialized());
         });  
@@ -30,8 +30,8 @@ const verifyAuth = () =>
         dispatch(signOutUser());
         dispatch(listenToCurrentUserProfile(null));
         dispatch(asyncActionInitialized());
+        if(profileUnsub) profileUnsub();
       }
-      //unsub();
     });
   }
 }

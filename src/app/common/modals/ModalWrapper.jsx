@@ -7,6 +7,7 @@ export default function ModalWrapper({children, size, header }) {
   const dispatch = useDispatch();
 
   const handleClose = () => {
+    //console.log("Modal close")
     dispatch(modalActions.closeModal());
   }
 

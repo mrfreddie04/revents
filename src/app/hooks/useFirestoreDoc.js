@@ -8,10 +8,12 @@ const { asyncActionStart, asyncActionFinish, asyncActionError} = asyncActions;
 
 export function useFirestoreDoc({query, data, deps, shouldExecute = true}) {
   const dispatch = useDispatch();
-
+  
   useEffect(() => {
     //check if we need to fetch data
     if(!shouldExecute) return;
+    
+    //console.log("FD", query);
 
     dispatch(asyncActionStart());
     const unsub = query().onSnapshot({

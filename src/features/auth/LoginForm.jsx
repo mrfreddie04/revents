@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from 'react-router-dom';
+//import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
@@ -21,7 +21,7 @@ const initialValues = {
 };
 
 export default function LoginForm() {
-  const history = useHistory();
+  //const history = useHistory();
   const dispatch = useDispatch();
 
   const handleFormSubmit = async (values, {setSubmitting, setErrors}) => {
@@ -33,7 +33,7 @@ export default function LoginForm() {
       //dispatch(signInUser(user));
       setSubmitting(false);
       dispatch(closeModal());
-      history.push('/events');  
+      //history.push('/events');  
     } catch(error) {
       setErrors({auth: "Problem with user name or password"});
       setSubmitting(false);

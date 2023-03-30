@@ -20,6 +20,6 @@ export default function modalReducer(state = initialState, {type, payload}) {
     case CLOSE_MODAL:
       return null;  
     default:
-      return state; //Or throw an error
+      return state; 
   }
 }

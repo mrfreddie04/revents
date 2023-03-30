@@ -16,12 +16,16 @@ export default function EventDetailedChat({event}) {
   const dispatch = useDispatch();
   const [showReplyForm, setShowReplyForm] = useState({open:false, commentId:null});
   const { comments } = useSelector( state => state.event );
+  const { authenticated } = useSelector( state => state.auth);
+
+  //const ref = authenticated ? () => getEventChatComments(event.id) : null;
 
   useFirebaseCollection({
     ref: () => getEventChatComments(event.id), 
     data: (arr)=>dispatch(listenToEventChat(arr.reverse())), 
     deps: [dispatch, event.id],
-    dispose: ()=>dispatch(clearComments())
+    dispose: ()=>dispatch(clearComments()),
+    shouldExecute: authenticated
   });
 
   const handleReplyAction = (commentId) => {
@@ -32,6 +36,8 @@ export default function EventDetailedChat({event}) {
     setShowReplyForm({open:false, commentId:null});
   }
 
+  const header = authenticated ? 'Chat about this event' : 'Sign in to view and comment';
+
   return (
     <>
       <Segment
@@ -41,38 +47,40 @@ export default function EventDetailedChat({event}) {
           color="teal"
           style={{border: 'none'}}
       >
-        <Header>Chat about this event</Header>
+        <Header>{header}</Header>
       </Segment>
 
-      <Segment attached>        
-        <EventDetailedChatForm eventId={event.id} parentId={0}/>
-        <Comment.Group>
-          {createDataTree(comments).map( comment =>(
-            <Comment key={comment.id}>
-              <EventComment comment={comment} eventId={event.id} parentId={comment.id} 
-                showReplyForm={showReplyForm}
-                onReply={handleReplyAction}
-                onSubmit={handleCommentSubmit}
-              />
+      {authenticated && (
+        <Segment attached>        
+          <EventDetailedChatForm eventId={event.id} parentId={0}/>
+          <Comment.Group>
+            {createDataTree(comments).map( comment =>(
+              <Comment key={comment.id}>
+                <EventComment comment={comment} eventId={event.id} parentId={comment.id} 
+                  showReplyForm={showReplyForm}
+                  onReply={handleReplyAction}
+                  onSubmit={handleCommentSubmit}
+                />
 
-              {comment.childNodes.length > 0 && (
-              <Comment.Group>
-                {comment.childNodes.reverse().map( child => (
-                  <Comment key={child.id}>
-                    <EventComment comment={child} eventId={event.id} parentId={child.parentId} 
-                      showReplyForm={showReplyForm}
-                      onReply={handleReplyAction}
-                      onSubmit={handleCommentSubmit}
-                    />                    
-                  </Comment>
-                ))}    
-              </Comment.Group>
-              )}
+                {comment.childNodes.length > 0 && (
+                <Comment.Group>
+                  {comment.childNodes.reverse().map( child => (
+                    <Comment key={child.id}>
+                      <EventComment comment={child} eventId={event.id} parentId={child.parentId} 
+                        showReplyForm={showReplyForm}
+                        onReply={handleReplyAction}
+                        onSubmit={handleCommentSubmit}
+                      />                    
+                    </Comment>
+                  ))}    
+                </Comment.Group>
+                )}
 
-            </Comment>
-          ))}
-        </Comment.Group>
-      </Segment>
+              </Comment>
+            ))}
+          </Comment.Group>
+        </Segment>
+      )}
     </>
   )
 }
