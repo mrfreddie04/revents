@@ -12,12 +12,13 @@ import LoadingComponent from '../../../app/layout/LoadingComponent';
 
 import { eventActions } from '../event-actions';
 
-const { listenToEvents } = eventActions;
+const { listenToSelectedEvent } = eventActions;
 
 export default function EventDetailedPage() {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const event = useSelector( state => state.event.events.find( event => event.id === id));
+  //const event = useSelector( state => state.event.events.find( event => event.id === id));
+  const event = useSelector( state => state.event.selectedEvent);
   const { loading, error } = useSelector(state => state.async);
   const { authenticated, currentUser } = useSelector(state => state.auth);
 
@@ -26,7 +27,7 @@ export default function EventDetailedPage() {
 
   useFirestoreDoc({
     query: () => listenToEventFromFirestore(id),
-    data: (event) => dispatch(listenToEvents([event])),
+    data: (event) => dispatch(listenToSelectedEvent(event)),
     deps: [dispatch, id]
   });  
 

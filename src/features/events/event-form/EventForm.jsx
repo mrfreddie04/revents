@@ -22,7 +22,7 @@ import DateInput from "../../../app/common/form/date-input";
 import PlaceInput from "../../../app/common/form/place-input";
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 
-const { listenToEvents } = eventActions;
+const { listenToSelectedEvent } = eventActions;
 
 const initialEventValues = {
   title:'',
@@ -37,17 +37,25 @@ export default function EventForm() {
   const [ loadingCancel, setLoadingCancel] = useState(false);
   const [ confirmOpen, setConfirmOpen] = useState(false);
   const { id } = useParams();
-  const event = useSelector( state => state.event.events.find( event => event.id === id))
+  //const event = useSelector( state => state.event.events.find( event => event.id === id))
+  const event = useSelector( state => state.event.selectedEvent);
   const { loading, error } = useSelector(state => state.async);
   const dispatch = useDispatch();
   const history = useHistory();
 
   useFirestoreDoc({
     query: () => listenToEventFromFirestore(id),
-    data: (event) => dispatch(listenToEvents([event])),
+    data: (event) => dispatch(listenToSelectedEvent(event)),
     deps: [dispatch, id],
     shouldExecute: !!id
   });  
+
+  // useFirestoreDoc({
+  //   query: () => listenToEventFromFirestore(id),
+  //   data: (event) => dispatch(listenToEvents([event])),
+  //   deps: [dispatch, id],
+  //   shouldExecute: !!id
+  // });  
     
   const handleFormSubmit = async (values, {setSubmitting}) => {
     //console.log(values);

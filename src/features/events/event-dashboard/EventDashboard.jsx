@@ -1,55 +1,72 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { Grid } from 'semantic-ui-react';
-import { useFirestoreCollection } from '../../../app/hooks/useFirestoreCollection';
+import { Grid, Loader } from 'semantic-ui-react';
 import EventFilters from "./EventFilters";
-//import LoadingComponent from "../../../app/layout/LoadingComponent";
-import { listenToEventsFromFirestore } from "../../../app/firestore/firebase-db-service";
 import { eventActions } from '../event-actions';
 import EventList from "./EventList";
 import EventListItemPlaceholder from "./EventListItemPlaceholder";
 import EventsFeed from "./EventsFeed";
 
-const { listenToEvents } = eventActions;
+const { fetchEvents, clearEvents } = eventActions;
 
 export default function EventDashboard() {
+  const limit = 2;
   const dispatch = useDispatch();
-  const { events } = useSelector(state => state.event);
-  const { loading } = useSelector(state => state.async);
-  const { authenticated } = useSelector(state => state.auth);
   const [predicate, setPredicate] = useState(new Map([
     ['startDate',new Date()],
     ['filter', 'all']
   ]));
+  const [initialLoading, setInitialLoading] = useState(false);
+  const { events, moreEvents, lastVisible } = useSelector(state => state.event);
+  const { loading } = useSelector(state => state.async);
+  const { authenticated } = useSelector(state => state.auth);
 
-  //console.log(predicte)
+  useEffect(() => {
+    setInitialLoading(true);
+    dispatch(clearEvents());
+    dispatch(fetchEvents(predicate, limit, null)).then(() => {
+      setInitialLoading(false);
+    });
+    
+    //not needed - it is enough to clear events up front
+    //return () => dispatch(clearEvents());
+  }, [dispatch, predicate, limit] ); //eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSetPredicate = (key, value) => {
-    //setPredicate(predicate=>predicate.set(key,value));
     setPredicate(new Map(predicate.set(key,value)));
   }
 
-  useFirestoreCollection({
-    query: ()=>listenToEventsFromFirestore(predicate),
-    data: (events) => dispatch(listenToEvents(events)),
-    deps: [dispatch, predicate] // listenToEvents, listenToEventsFromFirestore] 
-  });
+  const handleFetchNextPage = () => {
+    dispatch(fetchEvents(predicate, limit, lastVisible));
+  }
 
   return(    
     <Grid>
       <Grid.Column width={10}>
-        {loading && (
+        {initialLoading && (
           <>
             <EventListItemPlaceholder/>
             <EventListItemPlaceholder/>
           </>
         )} 
-        {!loading && <EventList events={events}/>}
+        {!initialLoading && (
+          <EventList 
+            events={events} 
+            onGetNextPage={handleFetchNextPage} 
+            loading={loading}
+            moreEvents={moreEvents}
+          />
+        )}
+
       </Grid.Column>
       <Grid.Column width={6}>
         { authenticated && <EventsFeed/>}
-        <EventFilters predicate={predicate} onSetPredicate={handleSetPredicate} loading={loading}/>
-      </Grid.Column>      
+        <EventFilters predicate={predicate} onSetPredicate={handleSetPredicate} loading={initialLoading}/>
+      </Grid.Column>    
+      <Grid.Column width={10}>
+         <Loader active={loading}/> 
+      </Grid.Column>  
     </Grid>
   );
 };
+

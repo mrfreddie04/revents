@@ -1,12 +1,12 @@
 import { db, auth, Timestamp, FieldValue } from "../config/firebase";
 
-export function listenToEventsFromFirestore(predicate) {
+export function fetchEventsFromFirestore(predicate, limit = 2, lastDocSnaphot = null) {
   const user = auth.currentUser;
   const filter = predicate.get('filter');
   const startDate = predicate.get('startDate');
 
   //return collection reference
-  const eventsRef = db.collection("events").orderBy('date'); //.orderBy('date'); //
+  const eventsRef = db.collection("events").orderBy('date').startAfter(lastDocSnaphot).limit(limit); 
   switch(filter) {
     case 'isHosting':
       return eventsRef
@@ -137,9 +137,66 @@ export function getUserPhotos(uid) {
 
 export async function setMainPhoto(photo) {
   const user = auth.currentUser;
+  //const today = new Date();
+
+  const userDocRef = db.collection("users").doc(user.uid);  
+  const eventHostingQuery = getUserEvents(user.uid,'hosting');
+  const eventAttendsQuery = getUserEvents(user.uid,'future');
+  const userFollowingRef = getFollowing(user.uid);
+  const userFollowersRef = getFollowers(user.uid);
+
+  const batch = db.batch();
+
   try {
-    const userDocRef = db.collection("users").doc(user.uid);  
-    await userDocRef.update({photoURL: photo.url});
+    batch.update(
+      userDocRef,
+      { photoURL: photo.url} 
+    );
+
+    //events hosted by the user
+    const eventHostingCollSnap = await eventHostingQuery.get();
+    eventHostingCollSnap.docs.forEach((doc) => {
+      batch.update(
+        doc.ref,//db.collection("events").doc(doc.id),
+        {hostPhotoURL: photo.url}
+      );  
+    });
+
+    //future events attended by the user
+    const eventAttendsCollSnap = await eventAttendsQuery.get();
+    eventAttendsCollSnap.docs.forEach((doc) => {
+      const attendees = doc.data().attendees;
+      batch.update(
+        doc.ref, //db.collection("events").doc(doc.id),
+        {attendees: attendees.map(attendee => attendee.id === user.uid 
+            ? {...attendee, photoURL: photo.url}
+            : attendee)}
+      );  
+    });
+
+    //profiles followed by the user - user shows up as a member of followers collection for each of these profiles
+    const userFollowingSnap = await userFollowingRef.get();
+    userFollowingSnap.docs.forEach(doc => {
+      const follower = getFollowers(doc.id).doc(user.uid);
+      batch.update(
+        follower,//db.collection("following").doc(doc.id).collection("followers").doc(user.uid),
+        {photoURL: photo.url}
+      );  
+    });    
+
+    //followers of the user - user shows up as a member of following collection for each of these followers
+    const userFollowersSnap = await userFollowersRef.get();
+    userFollowersSnap.docs.forEach(doc => {
+      const following = getFollowing(doc.id).doc(user.uid);
+      batch.update(
+        following,//db.collection("following").doc(doc.id).collection("followers").doc(user.uid),
+        {photoURL: photo.url}
+      );  
+    });    
+
+    await batch.commit();
+    //need to update events & following collections
+    //cannot place inside a batch, as it is an update to the auth service
     return await user.updateProfile({photoURL: photo.url});
   } catch(error) {
     throw error;
