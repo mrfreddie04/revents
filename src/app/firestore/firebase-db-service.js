@@ -1,9 +1,9 @@
 import { db, auth, Timestamp, FieldValue } from "../config/firebase";
 
-export function fetchEventsFromFirestore(predicate, limit = 2, lastDocSnaphot = null) {
+export function fetchEventsFromFirestore(filter, startDate, limit = 2, lastDocSnaphot = null) {
   const user = auth.currentUser;
-  const filter = predicate.get('filter');
-  const startDate = predicate.get('startDate');
+  //const filter = predicate.get('filter');
+  //const startDate = predicate.get('startDate');
 
   //return collection reference
   const eventsRef = db.collection("events").orderBy('date').startAfter(lastDocSnaphot).limit(limit); 

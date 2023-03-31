@@ -14,17 +14,22 @@ const { listenToSelectedUserProfile } = profileActions;
 export default function ProfilePage() {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { selectedUserProfile } = useSelector(state => state.profile);
+  const { selectedUserProfile, currentUserProfile } = useSelector(state => state.profile);
   const { currentUser } = useSelector(state => state.auth);
   const { loading, error } = useSelector(state => state.async);
+  
+  const isCurrentUser = currentUser.uid === id;
 
   useFirestoreDoc({
     query: () => getUserProfile(id),
     data: (profile) => dispatch(listenToSelectedUserProfile(profile)),
-    deps: [dispatch, id]
+    deps: [dispatch, id],
+    shouldExecute: !isCurrentUser
   });    
 
-  if((loading && !selectedUserProfile) || (!selectedUserProfile && !error)) {
+  const profile = isCurrentUser ? currentUserProfile : selectedUserProfile;
+
+  if((loading && !profile) || (!profile && !error)) {
     return <LoadingComponent content="Loading user profile..."/>
   }
 
@@ -32,13 +37,11 @@ export default function ProfilePage() {
     return (<Redirect to="/error"/>);
   }
 
-  const isCurrentUser = currentUser.uid === selectedUserProfile.id;
-
   return (
     <Grid>
       <Grid.Column width={16}>
-        <ProfileHeader profile={selectedUserProfile} isCurrentUser={isCurrentUser}/>
-        <ProfileContent profile={selectedUserProfile} isCurrentUser={isCurrentUser}/>
+        <ProfileHeader profile={profile} isCurrentUser={isCurrentUser}/>
+        <ProfileContent profile={profile} isCurrentUser={isCurrentUser}/>
       </Grid.Column>
     </Grid>  
   )

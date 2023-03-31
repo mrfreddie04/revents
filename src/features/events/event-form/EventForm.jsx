@@ -1,6 +1,6 @@
 /* global google */
-import React, { useState } from "react";
-import { Link, Redirect, useParams, useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Redirect, useParams, useHistory, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { Header, Segment, Button, Confirm } from 'semantic-ui-react';
 import { Formik, Form } from 'formik';
@@ -22,7 +22,7 @@ import DateInput from "../../../app/common/form/date-input";
 import PlaceInput from "../../../app/common/form/place-input";
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 
-const { listenToSelectedEvent } = eventActions;
+const { listenToSelectedEvent, clearSelectedEvent } = eventActions;
 
 const initialEventValues = {
   title:'',
@@ -37,29 +37,27 @@ export default function EventForm() {
   const [ loadingCancel, setLoadingCancel] = useState(false);
   const [ confirmOpen, setConfirmOpen] = useState(false);
   const { id } = useParams();
-  //const event = useSelector( state => state.event.events.find( event => event.id === id))
   const event = useSelector( state => state.event.selectedEvent);
   const { loading, error } = useSelector(state => state.async);
   const dispatch = useDispatch();
   const history = useHistory();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if(pathname === '/create-event') {
+      console.log("Clear selected");
+      dispatch(clearSelectedEvent());
+    }
+  }, [pathname, dispatch]);
 
   useFirestoreDoc({
     query: () => listenToEventFromFirestore(id),
     data: (event) => dispatch(listenToSelectedEvent(event)),
     deps: [dispatch, id],
-    shouldExecute: !!id
+    shouldExecute: id !== event?.id && pathname !== '/create-event'
   });  
 
-  // useFirestoreDoc({
-  //   query: () => listenToEventFromFirestore(id),
-  //   data: (event) => dispatch(listenToEvents([event])),
-  //   deps: [dispatch, id],
-  //   shouldExecute: !!id
-  // });  
-    
   const handleFormSubmit = async (values, {setSubmitting}) => {
-    //console.log(values);
-    //setSubmitting(true);
     try {
       event 
         ? await updateEventInFirestore(values) //dispatch(updateEvent({...event,...values}))
@@ -92,7 +90,6 @@ export default function EventForm() {
     }
   }
 
-  //const header = id ? 'Edit event' : 'Create new event';
   const values = event || initialEventValues;
 
   const validationSchema = Yup.object({
@@ -111,11 +108,10 @@ export default function EventForm() {
   if(error) return (<Redirect to="/error"/>);
   if(loading) return <LoadingComponent content='Loading event...' />;
 
-
-
   return(    
     <Segment clearing>
       <Formik
+        enableReinitialize
         initialValues={values} 
         validationSchema={validationSchema}
         onSubmit={(values, actions)=>{
@@ -147,6 +143,7 @@ export default function EventForm() {
             showTimeSelect
             timeCaption='time'
             dateFormat='MMMM d, yyyy h:mm a'
+            autoComplete='off'
           /> 
           {event && (
             <>

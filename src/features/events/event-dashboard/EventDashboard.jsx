@@ -7,37 +7,34 @@ import EventList from "./EventList";
 import EventListItemPlaceholder from "./EventListItemPlaceholder";
 import EventsFeed from "./EventsFeed";
 
-const { fetchEvents, clearEvents } = eventActions;
+const { fetchEvents, setRetainState } = eventActions;
 
 export default function EventDashboard() {
   const limit = 2;
   const dispatch = useDispatch();
-  const [predicate, setPredicate] = useState(new Map([
-    ['startDate',new Date()],
-    ['filter', 'all']
-  ]));
+  // const [predicate, setPredicate] = useState(new Map([
+  //   ['startDate',new Date()],
+  //   ['filter', 'all']
+  // ]));
   const [initialLoading, setInitialLoading] = useState(false);
-  const { events, moreEvents, lastVisible } = useSelector(state => state.event);
+  const { events, moreEvents, lastVisible, filter, startDate, retainState } = useSelector(state => state.event);
   const { loading } = useSelector(state => state.async);
   const { authenticated } = useSelector(state => state.auth);
 
   useEffect(() => {
-    setInitialLoading(true);
-    dispatch(clearEvents());
-    dispatch(fetchEvents(predicate, limit, null)).then(() => {
-      setInitialLoading(false);
-    });
+    if(!retainState) {
+      setInitialLoading(true);
+      dispatch(fetchEvents(filter, startDate, limit, null)).then(() => {
+        setInitialLoading(false);
+      });
+    }
     
-    //not needed - it is enough to clear events up front
-    //return () => dispatch(clearEvents());
-  }, [dispatch, predicate, limit] ); //eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleSetPredicate = (key, value) => {
-    setPredicate(new Map(predicate.set(key,value)));
-  }
+    //when we leave this component we will set retainState flag
+    return () => dispatch(setRetainState());
+  }, [dispatch, filter, startDate, limit, retainState] ); //eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFetchNextPage = () => {
-    dispatch(fetchEvents(predicate, limit, lastVisible));
+    dispatch(fetchEvents(filter, startDate, limit, lastVisible));
   }
 
   return(    
@@ -61,7 +58,9 @@ export default function EventDashboard() {
       </Grid.Column>
       <Grid.Column width={6}>
         { authenticated && <EventsFeed/>}
-        <EventFilters predicate={predicate} onSetPredicate={handleSetPredicate} loading={initialLoading}/>
+        <EventFilters 
+          loading={initialLoading}
+        />
       </Grid.Column>    
       <Grid.Column width={10}>
          <Loader active={loading}/> 

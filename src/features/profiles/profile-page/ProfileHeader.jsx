@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
-// import { Link, useHistory } from "react-router-dom";
 import { Segment, Grid, Item, Statistic, Divider, Reveal, Button } from 'semantic-ui-react';
 import { profileActions } from '../profile-actions';
-// import { authActions } from '../../features/auth/auth-actions';
-// import { signOut } from "../../app/firestore/firebase-auth-service";
 import { followUser, unfollowUser, isFollowing } from '../../../app/firestore/firebase-db-service';
 
-const { setFollowUser, setUnfollowUser /*, clearFollowings*/ } = profileActions;
+const { setFollowUser, setUnfollowUser } = profileActions;
 
 export default function ProfileHeader({profile, isCurrentUser}) {
   const [loading, setLoading] = useState(false);

@@ -1,10 +1,23 @@
 import React from 'react';
 import Calendar from 'react-calendar';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {Header, Menu} from 'semantic-ui-react';
+import { eventActions } from '../event-actions';
 
-export default function EventFilters({predicate, onSetPredicate,loading}) {
+const { setFilter, setStartDate } = eventActions;
+
+export default function EventFilters({ loading }) {
+  const dispatch = useDispatch();
   const { authenticated } = useSelector(state => state.auth);
+  const { filter, startDate } = useSelector(state => state.event);
+
+  const handleSetFilter = (value) => {
+    dispatch(setFilter(value));
+  }
+
+  const handleSetStartDate = (value) => {
+    dispatch(setStartDate(value));
+  }  
 
   return (
     <>
@@ -14,28 +27,28 @@ export default function EventFilters({predicate, onSetPredicate,loading}) {
           <Menu.Item 
             disabled={loading}
             content='All Events' 
-            active={predicate.get('filter') === 'all'}
-            onClick={() => onSetPredicate('filter','all')}
+            active={filter === 'all'}
+            onClick={() => handleSetFilter('all')}
           />
           <Menu.Item 
             disabled={loading}
             content="I'm going" 
-            active={predicate.get('filter') === 'isGoing'}
-            onClick={() => onSetPredicate('filter','isGoing')}          
+            active={filter === 'isGoing'}
+            onClick={() => handleSetFilter('isGoing')}          
           />
           <Menu.Item 
             disabled={loading}
             content="I'm hosting" 
-            active={predicate.get('filter') === 'isHosting'}
-            onClick={() => onSetPredicate('filter','isHosting')}
+            active={filter === 'isHosting'}
+            onClick={() => handleSetFilter('isHosting')}
           />
         </Menu>
       )}
       <Header icon='calendar' attached color='teal' content='Select date'/>
       <Calendar 
-        value={predicate.get('startDate') || new Date()}
-        onChange={(date) => onSetPredicate('startDate', date)}
-        tileDisabled={()=>loading}
+        value={startDate || new Date()}
+        onChange={handleSetStartDate}
+        tileDisabled={() => loading}
       />
     </>
   );

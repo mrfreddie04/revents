@@ -2,7 +2,8 @@ import { eventActionTypes } from "./event-action-types";
 //import { sampleData } from "../../app/api/sampleData";
 const { 
   CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, FETCH_EVENTS, FETCH_EVENT, 
-  LISTEN_TO_EVENT_CHAT, CLEAR_COMMENTS, CLEAR_EVENTS, LISTEN_TO_SELECTED_EVENT
+  LISTEN_TO_EVENT_CHAT, CLEAR_COMMENTS, CLEAR_EVENTS, LISTEN_TO_SELECTED_EVENT,
+  SET_FILTER, SET_START_DATE, RETAIN_STATE, CLEAR_SELECTED_EVENT
 } = eventActionTypes;
 
 const initialState = {
@@ -10,7 +11,10 @@ const initialState = {
   events: [],
   comments: [],
   lastVisible: null,
-  moreEvents: false
+  moreEvents: true,
+  filter: 'all',
+  startDate: new Date(),
+  retainState: false
 };
 
 export default function eventReducer(state = initialState, {type, payload}) {
@@ -35,11 +39,20 @@ export default function eventReducer(state = initialState, {type, payload}) {
       return { ...state, comments: [...payload]}; 
     case CLEAR_COMMENTS:  
       return { ...state, comments: []}; 
+    case CLEAR_SELECTED_EVENT:  
+      return { ...state, selectedEvent: null }; 
+    case SET_FILTER:  
+      return { ...state, filter: payload, retainState: false}; 
+    case SET_START_DATE:  
+      return { ...state, startDate: payload, retainState: false}; 
+    case RETAIN_STATE:  
+      return { ...state, retainState: true}; 
     case CLEAR_EVENTS:  
       return { ...state, 
                events: [], 
-               moreEvents: false, 
-               lastVisible: null };
+               moreEvents: true, 
+               lastVisible: null,
+               retainState: false };
     default:
       return state; //Or throw an error
   }

@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import 'react-calendar/dist/Calendar.css';
 import './app/layout/styles.css';
 import App from './app/layout/App';
+//import * as serviceWorker from './serviceWorker';
 import { configureStore, history } from './app/store/configure-store';
 import ScrollToTop from './app/layout/ScrollToTop';
 //import { eventActions } from './features/events/event-actions';
@@ -43,3 +44,4 @@ render();
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 //reportWebVitals();
+//serviceWorker.register();
