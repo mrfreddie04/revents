@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-//import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Segment, Comment, Header } from 'semantic-ui-react';
-//import { formatDistance } from 'date-fns';
 import { getEventChatComments } from '../../../app/firestore/firebase-realtime-service';
 import { useFirebaseCollection } from '../../../app/hooks/useFirebaseCollection';
 import { eventActions } from "../event-actions";
@@ -17,8 +15,6 @@ export default function EventDetailedChat({event}) {
   const [showReplyForm, setShowReplyForm] = useState({open:false, commentId:null});
   const { comments } = useSelector( state => state.event );
   const { authenticated } = useSelector( state => state.auth);
-
-  //const ref = authenticated ? () => getEventChatComments(event.id) : null;
 
   useFirebaseCollection({
     ref: () => getEventChatComments(event.id), 

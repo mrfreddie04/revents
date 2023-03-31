@@ -2,17 +2,21 @@ import React, { useRef } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 
-export default function PhotoWidgetCropper({url, onCreateImage}) {
+export default function PhotoWidgetCropper({url, onCrop /*, onCreateImage*/}) {
   const cropperRef = useRef(null);
 
+  // const handleCrop = () => {
+  //   const cropper = cropperRef.current?.cropper;
+  //   if(cropper) {
+  //     cropper.getCroppedCanvas().toBlob( blob => {
+  //       onCreateImage(blob);
+  //     }, 'image/jpeg');
+  //   }
+  // }
+
   const handleCrop = () => {
-    const cropper = cropperRef.current?.cropper;
-    if(cropper) {
-      cropper.getCroppedCanvas().toBlob( blob => {
-        onCreateImage(blob);
-      }, 'image/jpeg');
-    }
-  }
+    onCrop(cropperRef.current?.cropper);
+  }  
   
   return (
     <Cropper

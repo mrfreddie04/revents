@@ -1,3 +1,4 @@
+import { ref , push, query, orderByKey, limitToLast } from 'firebase/database';
 import { realtime, auth } from "../config/firebase";
 
 export function addEventChatComment(eventid, parentId, comment) {
@@ -11,21 +12,26 @@ export function addEventChatComment(eventid, parentId, comment) {
     date: Date.now(),
     parentId: parentId 
   }
-  return realtime.ref(`chat/${eventid}`).push(newComment);
+  return push(ref(realtime, `chat/${eventid}`), newComment);
+  //return realtime.ref(`chat/${eventid}`).push(newComment);
 }
 
 export function getEventChatComments(eventid) {
-  //console.log("GECC",eventid);
-  return realtime.ref(`chat/${eventid}`).orderByKey();
+  return query(ref(realtime, `chat/${eventid}`), orderByKey())
+  //return realtime.ref(`chat/${eventid}`).orderByKey();
 }  
 
 export function getUserFeed() {
   const user = auth.currentUser; 
-  return realtime.ref(`posts/${user.uid}`).orderByKey().limitToLast(5);
+  if(!user) return;
+  return query(ref(realtime, `posts/${user.uid}`), orderByKey(), limitToLast(5))
+  //return realtime.ref(`posts/${user.uid}`).orderByKey().limitToLast(5);
 }  
 
 export function firebaseObjectToArray(snapshot) {
-  return Object.entries(snapshot.val()).map(([key,value]) => {
-    return {...value, id:key};
-  });
+  if(snapshot) {
+    return Object.entries(snapshot).map(([key,value]) => {
+      return {...value, id:key};
+    });
+  }
 }

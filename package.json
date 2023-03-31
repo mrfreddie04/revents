@@ -12,7 +12,6 @@
     "firebase": "^9.18.0",
     "formik": "^2.2.9",
     "google-map-react": "^2.2.0",
-    "history": "^4.10.1",
     "react": "^18.2.0",
     "react-calendar": "^4.0.0",
     "react-cropper": "^2.3.2",

@@ -1,19 +1,13 @@
 //import firebase CORE
-import firebase from "firebase/compat/app"; 
-// import firebase from "firebase/app"; 
+import { initializeApp } from "firebase/app";  
 
-//import services we want to use
-// import "firebase/firestore";    //firestore database
-// import "firebase/database";     //realtime database - we will use for chat
-// import "firebase/auth";         //firestore authentication services
-// import "firebase/storage";      //firebase storage
-
-import "firebase/compat/firestore";    //firestore database
-import "firebase/compat/database";     //realtime database - we will use for chat
-import "firebase/compat/auth";         //firestore authentication services
-import "firebase/compat/storage";      //firebase storage
-
-//console.log(process.env.REACT_APP_API_KEY)
+// import services we want to use
+//firestore database
+import { getFirestore } from "firebase/firestore";
+//firestore authentication services
+import { getAuth } from "firebase/auth";          
+import { getStorage } from "firebase/storage";    //firebase storage
+import { getDatabase } from "firebase/database";  //realtime database - we will use for chat
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -25,25 +19,17 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase - connects to firebase backend (in the cloud)
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services that we want to use
 // It returns an object we can use to interact with Firebase services
-const db = firebase.firestore(); //firestore (db)
-const realtime = firebase.database(); //realtime (db)
-const auth = firebase.auth(); //Authentication
-const storage = firebase.storage(); //Storage
-
+const db = getFirestore(app);  //firestore (db)
+const realtime = getDatabase(app); //realtime (db)
+const auth = getAuth(app); //Authentication
+const storage = getStorage(app); //Storage
 
 //timestamp - alias for firebase.firestore.Timestamp function
-//it created timestamp data property
-const Timestamp = firebase.firestore.Timestamp;
-const FieldValue = firebase.firestore.FieldValue;
-const FacebookAuthProvider =  firebase.auth.FacebookAuthProvider
-const GoogleAuthProvider =  firebase.auth.GoogleAuthProvider
 
-export default firebase;
 export { 
-  db, realtime, auth, storage, 
-  Timestamp, FieldValue, FacebookAuthProvider, GoogleAuthProvider 
+  app, db, realtime, auth, storage
 };

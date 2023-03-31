@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { Menu, Image, Dropdown } from 'semantic-ui-react';
 import { toast } from 'react-toastify';
 //import { authActions } from '../../features/auth/auth-actions';
-import { signOut } from "../../app/firestore/firebase-auth-service";
+import { signOutDb } from "../../app/firestore/firebase-auth-service";
 
 //const { signOutUser } = authActions;
 
@@ -21,7 +21,7 @@ export default function SignedInMenu() {
     //dispatch(signOutUser());
     try {
       history.push("/");
-      await signOut();
+      await signOutDb();
     } catch(error) {
       toast.error(error);
     }

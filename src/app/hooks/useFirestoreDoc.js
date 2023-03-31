@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { onSnapshot } from '@firebase/firestore';
 import { dataFromSnapshot } from "../firestore/firebase-db-service";
 import { asyncActions } from '../async/async-reducer';
 //import { delay } from '../common/util/util';
@@ -16,7 +17,7 @@ export function useFirestoreDoc({query, data, deps, shouldExecute = true}) {
     //console.log("FD", query);
 
     dispatch(asyncActionStart());
-    const unsub = query().onSnapshot({
+    const unsub = onSnapshot( query(), {
       next: (snapshot) => {
         if(!snapshot.exists) {
           dispatch(asyncActionError({code: "not_found", message: "Couldn't not find document"}));

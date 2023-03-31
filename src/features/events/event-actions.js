@@ -1,3 +1,4 @@
+import { getDocs } from 'firebase/firestore';
 import { eventActionTypes } from "./event-action-types";
 import { asyncActions } from '../../app/async/async-reducer';
 //import { fetchSampleData } from "../../app/api/mockApi";
@@ -39,7 +40,7 @@ export const eventActions = {
       dispatch(asyncActionStart());
       try {
         //const events = await fetchSampleData();
-        const snapshot = await fetchEventsFromFirestore(filter, startDate, limit, lastDocSnapshot).get();
+        const snapshot = await getDocs(fetchEventsFromFirestore(filter, startDate, limit, lastDocSnapshot));
         const lastVisible = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length-1] : null;
         const moreEvents = snapshot.docs.length >= limit; //check if there could be more events to fetch
         const events = snapshot.docs.map(doc => dataFromSnapshot(doc));

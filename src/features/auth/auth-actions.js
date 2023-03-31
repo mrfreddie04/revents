@@ -1,10 +1,10 @@
+import { onSnapshot } from '@firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from "../../app/config/firebase";
 import { authActionTypes } from "./auth-action-types";
 import { asyncActions } from "../../app/async/async-reducer";
 import { profileActions } from '../profiles/profile-actions';
 import { getUserProfile, dataFromSnapshot } from "../../app/firestore/firebase-db-service";
-//import { signInWithEmail } from "../../app/firestore/firebase-auth-service";
-//import { delay } from "../../app/common/util/util.js";
 
 const { SIGN_IN_USER, SIGN_OUT_USER } = authActionTypes;
 const { asyncActionInitialized } = asyncActions;
@@ -18,11 +18,11 @@ const verifyAuth = () =>
 {
   return (dispatch) => {
     let profileUnsub;
-    auth.onAuthStateChanged( (user) => {      
+    onAuthStateChanged( auth, (user) => {      
       if(user) {
         dispatch(signInUser(user));
         const profileRef = getUserProfile(user.uid);
-        profileUnsub = profileRef.onSnapshot((snapshot) => {
+        profileUnsub = onSnapshot(profileRef, (snapshot) => {
           dispatch(listenToCurrentUserProfile(dataFromSnapshot(snapshot)));
           dispatch(asyncActionInitialized());
         });  

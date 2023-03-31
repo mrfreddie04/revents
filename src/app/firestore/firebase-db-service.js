@@ -1,107 +1,131 @@
-import { db, auth, Timestamp, FieldValue } from "../config/firebase";
+import {
+  collection,
+  Timestamp,
+  doc,
+  addDoc,
+  setDoc,
+  getDoc,
+  getDocs,
+  arrayUnion,
+  arrayRemove,
+  updateDoc,
+  query,
+  orderBy,
+  where,
+  deleteDoc,
+  serverTimestamp,
+  increment,
+  writeBatch,
+  limit,
+  startAfter
+} from 'firebase/firestore';
+import { updateProfile } from 'firebase/auth';
+import { db, auth } from "../config/firebase";
 
-export function fetchEventsFromFirestore(filter, startDate, limit = 2, lastDocSnaphot = null) {
+export function fetchEventsFromFirestore(filter, startDate, pageSize = 2, lastDocSnaphot = null) {
   const user = auth.currentUser;
-  //const filter = predicate.get('filter');
-  //const startDate = predicate.get('startDate');
 
   //return collection reference
-  const eventsRef = db.collection("events").orderBy('date').startAfter(lastDocSnaphot).limit(limit); 
+  const q = query(collection(db, "events"), orderBy('date'), startAfter(lastDocSnaphot), limit(pageSize)); 
   switch(filter) {
     case 'isHosting':
-      return eventsRef
-        .where('hostUid', '==', user.uid)
-        .where('date', '>=', startDate);
+      return query(q,
+        where('hostUid', '==', user.uid),
+        where('date', '>=', startDate))
     case 'isGoing':  
-      return eventsRef
-        .where("attendeeIds", "array-contains", user.uid)
-        .where('date', '>=', startDate);
+      return query(q,
+        where("attendeeIds", "array-contains", user.uid),
+        where('date', '>=', startDate))
     default:
-      return eventsRef.where('date', '>=', startDate);  
+      return query(q,where('date', '>=', startDate));  
   }
 }  
 
 export function getUserEvents(uid, filter) {
-  const eventsRef = db.collection("events");
+  const eventsRef = collection(db, "events");
   const today = new Date();
   switch(filter) {
     case 'future':
-      return eventsRef
-        .where("attendeeIds", "array-contains", uid)
-        .where('date', '>', today)
-        .orderBy('date');
+      return query(eventsRef,
+        where("attendeeIds", "array-contains", uid),
+        where('date', '>', today),
+        orderBy('date'));
     case 'past':  
-      return eventsRef
-        .where("attendeeIds", "array-contains", uid)
-        .where('date', '<=', today)
-        .orderBy('date', 'desc');
+      return query(eventsRef,
+        where("attendeeIds", "array-contains", uid),
+        where('date', '<=', today),
+        orderBy('date', 'desc'));
     case 'hosting':
-      return eventsRef
-        .where('hostUid', '==', uid)
-        .orderBy('date');
+      return query(eventsRef,
+        where('hostUid', '==', uid),
+        orderBy('date'));
     default:
-      return eventsRef;  
+      return query(eventsRef);  
   }  
 }  
 
 export function listenToEventFromFirestore(id) {
   //return document reference
-  return db.collection("events").doc(id);
+  return doc(db, "events", id);
 }  
 
 export function addEventToFirestore(event) {
   const user = auth.currentUser;
-  return db.collection("events").add({
+  return addDoc(collection(db,"events"), {
     ...event,
     hostUid: user.uid,
     hostedBy: user.displayName,
     hostPhotoURL: user.photoURL || null,
-    attendees: FieldValue.arrayUnion({
+    attendees: arrayUnion({
       id: user.uid,
       displayName: user.displayName,
       photoURL: user.photoURL || null
     }),
-    attendeeIds: FieldValue.arrayUnion(user.uid)  
+    attendeeIds: arrayUnion(user.uid)  
   });
 }
 
 export function updateEventInFirestore(event) {
   //const doc = dataToSnapshot(event);
-  return db.collection("events").doc(event.id).update(event);
+  const eventDoc = doc(db, "events", event.id);
+  return updateDoc(eventDoc, event);
 }
 
 export function deleteEventInFirestore(event) {
-  return db.collection("events").doc(event.id).delete();;
+  const eventDoc = doc(db, "events", event.id);
+  return deleteDoc(eventDoc);
 }
 
 export function cancelEventToggle(event) {
-  return db.collection("events").doc(event.id).update({
+  const eventDoc = doc(db, "events", event.id);
+  return updateDoc(eventDoc, {
     isCancelled: !event.isCancelled
   });
 }
 
 export function setUserProfileData(user) {
-  return db.collection("users").doc(user.uid).set({
+  const userDoc = doc(db, "users", user.uid);
+  return setDoc( userDoc, {
     displayName: user.displayName,
     email: user.email,
     photoURL: user.photoURL || null,
-    createdAt: FieldValue.serverTimestamp() //Timestamp.fromDate(new Date())
+    createdAt: serverTimestamp() //Timestamp.fromDate(new Date())
   });
 }
 
 export function getUserProfile(uid) {
   //return collection reference
-  return db.collection("users").doc(uid);
+  return doc(db, "users", uid);
 }  
 
 export async function updateUserProfile(profile) {
   const user = auth.currentUser;
-  //if(user.uid !== profile.id) return;
+
   try {
     if(user.displayName !== profile.displayName) {
-      await user.updateProfile({displayName: profile.displayName});
+      await updateProfile(user, {displayName: profile.displayName});
     }
-    return await db.collection("users").doc(user.uid).update(profile);
+    return await updateDoc(doc(db, "users", user.uid), profile);
   } catch(error) {
     throw error;
   }
@@ -109,14 +133,17 @@ export async function updateUserProfile(profile) {
 
 export async function updateUserProfilePhoto(downloadURL, filename) {
   const user = auth.currentUser;
-  const userDocRef = db.collection("users").doc(user.uid);
+  const userDocRef = doc(db, "users", user.uid);
   try {
-    const userDoc = await userDocRef.get();
+    const userDoc = await getDoc(userDocRef);
     if(!userDoc.data().photoURL) {
-      await userDocRef.update({photoURL: downloadURL});
-      await user.updateProfile({photoURL: downloadURL});
+      await updateDoc(userDocRef, {photoURL: downloadURL});
+      await updateProfile(user, {photoURL: downloadURL});
     }
-    await userDocRef.collection('photos').add({name:filename, url: downloadURL});
+    await addDoc(
+      collection(db, "users", user.uid, 'photos'), 
+      {name:filename, url: downloadURL}
+    );
   } catch(error) {
     throw error;
   }  
@@ -125,27 +152,27 @@ export async function updateUserProfilePhoto(downloadURL, filename) {
 export async function deleteUserProfilePhoto(photoid) {
   const { uid } = auth.currentUser;
   try {
-    await db.collection("users").doc(uid).collection('photos').doc(photoid).delete();
+    await deleteDoc(doc(db, "users", uid, 'photos', photoid));
   } catch(error) {
     throw error;
   }  
 }  
 
 export function getUserPhotos(uid) {
-  return db.collection("users").doc(uid).collection("photos");
+  return collection(db, "users", uid, "photos");
 }  
 
 export async function setMainPhoto(photo) {
   const user = auth.currentUser;
   //const today = new Date();
 
-  const userDocRef = db.collection("users").doc(user.uid);  
+  const userDocRef = doc(db, "users", user.uid);  
   const eventHostingQuery = getUserEvents(user.uid,'hosting');
   const eventAttendsQuery = getUserEvents(user.uid,'future');
   const userFollowingRef = getFollowing(user.uid);
   const userFollowersRef = getFollowers(user.uid);
 
-  const batch = db.batch();
+  const batch = writeBatch(db);
 
   try {
     batch.update(
@@ -154,7 +181,7 @@ export async function setMainPhoto(photo) {
     );
 
     //events hosted by the user
-    const eventHostingCollSnap = await eventHostingQuery.get();
+    const eventHostingCollSnap = await getDocs(eventHostingQuery);
     eventHostingCollSnap.docs.forEach((doc) => {
       batch.update(
         doc.ref,//db.collection("events").doc(doc.id),
@@ -163,7 +190,7 @@ export async function setMainPhoto(photo) {
     });
 
     //future events attended by the user
-    const eventAttendsCollSnap = await eventAttendsQuery.get();
+    const eventAttendsCollSnap = await getDocs(eventAttendsQuery);
     eventAttendsCollSnap.docs.forEach((doc) => {
       const attendees = doc.data().attendees;
       batch.update(
@@ -175,21 +202,22 @@ export async function setMainPhoto(photo) {
     });
 
     //profiles followed by the user - user shows up as a member of followers collection for each of these profiles
-    const userFollowingSnap = await userFollowingRef.get();
-    userFollowingSnap.docs.forEach(doc => {
-      const follower = getFollowers(doc.id).doc(user.uid);
+    const userFollowingSnap = await getDocs(userFollowingRef);
+    userFollowingSnap.docs.forEach(docRef => {
+      const followerDocRef = doc(db, "following", docRef.id, "followers", user.uid);
       batch.update(
-        follower,//db.collection("following").doc(doc.id).collection("followers").doc(user.uid),
+        followerDocRef,//db.collection("following").doc(doc.id).collection("followers").doc(user.uid),
         {photoURL: photo.url}
       );  
     });    
 
     //followers of the user - user shows up as a member of following collection for each of these followers
-    const userFollowersSnap = await userFollowersRef.get();
-    userFollowersSnap.docs.forEach(doc => {
-      const following = getFollowing(doc.id).doc(user.uid);
+    const userFollowersSnap = await getDocs(userFollowersRef);
+    userFollowersSnap.docs.forEach(docRef => {
+      //const following = getFollowing(doc.id).doc(user.uid);
+      const followingDocRef = doc(db, "following", docRef.id, "following", user.uid);
       batch.update(
-        following,//db.collection("following").doc(doc.id).collection("followers").doc(user.uid),
+        followingDocRef,//db.collection("following").doc(doc.id).collection("followers").doc(user.uid),
         {photoURL: photo.url}
       );  
     });    
@@ -197,7 +225,7 @@ export async function setMainPhoto(photo) {
     await batch.commit();
     //need to update events & following collections
     //cannot place inside a batch, as it is an update to the auth service
-    return await user.updateProfile({photoURL: photo.url});
+    return await updateProfile(user, {photoURL: photo.url});
   } catch(error) {
     throw error;
   }  
@@ -205,25 +233,25 @@ export async function setMainPhoto(photo) {
 
 export function addEventAttendee(event) {
   const user = auth.currentUser;
-  const eventDocRef = db.collection("events").doc(event.id);
-  return eventDocRef.update({
-    attendees: FieldValue.arrayUnion({
+  const eventDocRef = doc(db, "events", event.id);
+  return updateDoc(eventDocRef, {
+    attendees: arrayUnion({
       id: user.uid,
       displayName: user.displayName,
       photoURL: user.photoURL || null
     }),
-    attendeeIds: FieldValue.arrayUnion(user.uid)  
+    attendeeIds: arrayUnion(user.uid)  
   });
 }
 
 export async function removeEventAttendee(event) {
   const user = auth.currentUser;
-  const eventDocRef = db.collection("events").doc(event.id);
+  const eventDocRef = doc(db, "events", event.id);
   try {
-    const eventDoc = await eventDocRef.get();
-    return eventDocRef.update({
+    const eventDoc = await getDoc(eventDocRef);
+    return updateDoc( eventDocRef, {
       attendees: eventDoc.data().attendees.filter(a => a.id !== user.uid),
-      attendeeIds: FieldValue.arrayRemove(user.uid)  
+      attendeeIds: arrayRemove(user.uid)  
     });
   } catch(error) {
     throw error;
@@ -232,11 +260,11 @@ export async function removeEventAttendee(event) {
 
 export async function followUser(profile) {
   const user = auth.currentUser;
-  const batch = db.batch();
+  const batch = writeBatch(db);
   //current user is following profile user
   try {
     batch.set(
-      db.collection("following").doc(user.uid).collection("following").doc(profile.id),
+      doc(db, "following", user.uid, "following", profile.id),
       {
         displayName: profile.displayName,
         photoURL: profile.photoURL,
@@ -252,8 +280,8 @@ export async function followUser(profile) {
     //   }
     // );
     batch.update(
-      db.collection("users").doc(user.uid),
-      { followingCount: FieldValue.increment(1) }
+      doc(db, "users", user.uid),
+      { followingCount: increment(1) }
     );
     // batch.update(
     //   db.collection("users").doc(profile.id),
@@ -268,14 +296,14 @@ export async function followUser(profile) {
 
 export async function unfollowUser(profile) {
   const user = auth.currentUser;
-  const batch = db.batch();
+  const batch = writeBatch(db);
   //current user is following profile user
   try {
-    batch.delete(db.collection("following").doc(user.uid).collection("following").doc(profile.id));
+    batch.delete(doc(db, "following", user.uid, "following", profile.id));
     //batch.delete(db.collection("following").doc(profile.id).collection("followers").doc(user.uid));
     batch.update(
-      db.collection("users").doc(user.uid),
-      { followingCount: FieldValue.increment(-1) }
+      doc(db, "users", user.uid),
+      { followingCount: increment(-1) }
     );
     // batch.update(
     //   db.collection("users").doc(profile.id),
@@ -296,18 +324,18 @@ export async function unfollowUser(profile) {
 }
 
 export function getFollowers(profileId) {
-  return db.collection("following").doc(profileId).collection("followers");
+  return collection(db, "following", profileId, "followers");
 }  
 
 export function getFollowing(profileId) {
-  return db.collection("following").doc(profileId).collection("following");
+  return collection(db, "following", profileId, "following");
 }  
 
 export async function isFollowing(profileId) {
   const user = auth.currentUser;
   try {
-    const doc = await db.collection("following").doc(user.uid).collection("following").doc(profileId).get();
-    return doc.exists;
+    const profileDoc = await getDoc(doc(db, "following", user.uid, "following", profileId));
+    return profileDoc.exists;
   } catch (error) {
     throw error;
   }
@@ -344,14 +372,3 @@ export function dataFromSnapshot(doc) {
 
   return { ...data, id: doc.id };
 }
-
-// export function getEventsFromFirestore(observer) {
-//   //get reference to the collection
-//   const ref = db.collection("events");
-
-//   //set up onSnapshot event listener
-//   const unsub = ref.onSnapshot(observer); 
-
-//   //return function to unsubscribe on unmount
-//   return unsub;
-// }  

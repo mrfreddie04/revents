@@ -21,8 +21,8 @@ export default function ProfileHeader({profile, isCurrentUser}) {
     const checkFollowing = async () => {
       try {
         await isFollowing(profile.id)
-          ? dispatch(setFollowUser())
-          : dispatch(setUnfollowUser());
+           ? dispatch(setFollowUser())
+           : dispatch(setUnfollowUser());
       } catch(error) {
         toast.error(error.message);
       } finally {

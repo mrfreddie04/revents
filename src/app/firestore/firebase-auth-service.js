@@ -1,17 +1,27 @@
-import { auth, GoogleAuthProvider, FacebookAuthProvider } from "../config/firebase";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  FacebookAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+  updatePassword,
+} from "firebase/auth";
+import { auth } from "../config/firebase";
 import { setUserProfileData } from "./firebase-db-service";
 
 export function signInWithEmail(creds) {
-  return auth.signInWithEmailAndPassword(creds.email, creds.password);
+  return signInWithEmailAndPassword(auth, creds.email, creds.password);
 }
 
 export async function registerWithEmail(creds) {
   const {email, password, displayName } = creds;
   try {
     //create user
-    const { user } = await auth.createUserWithEmailAndPassword(email, password);
+    const { user } = await createUserWithEmailAndPassword(auth, email, password);
     //update user profile - in auth service
-    await user.updateProfile({
+    await updateProfile(user, {
       displayName: displayName
     });
     //add user profile is firestore db
@@ -22,14 +32,14 @@ export async function registerWithEmail(creds) {
   }
 }
 
-export function signOut() {
-  return auth.signOut();
+export function signOutDb() {
+  return signOut(auth);
 }
 
 export function updateUserPassword(creds) {
   //get current user
   const user = auth.currentUser; //synchronous from local storage
-  return user.updatePassword(creds.password);
+  return updatePassword(user, creds.password);
 }
 
 export async function socialLogin(selectedProvider) {
@@ -43,12 +53,13 @@ export async function socialLogin(selectedProvider) {
 
   try {
     //authenticate client using popup based authentication
-    const result = await auth.signInWithPopup(provider);
+    const result = await signInWithPopup(auth, provider);
     console.log(result);
-    
-    if(result.additionalUserInfo.isNewUser) {
+
+    if (result._tokenResponse.isNewUser) {
       await setUserProfileData(result.user);
     }
+
   } catch(error) {
     throw error;    
   }
